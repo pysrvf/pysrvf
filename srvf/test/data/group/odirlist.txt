@@ -1,3 +1,0 @@
-curvematch/test/data/group/curve2_out
-curvematch/test/data/group/curve3_out
-curvematch/test/data/group/curve4_out

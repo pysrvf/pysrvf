@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CMakeRunConfigurationManager" shouldGenerate="true" shouldDeleteObsolete="true">
+    <generated>
+      <config projectName="DP_Shape_Match_func_nDim" targetName="DP_Shape_Match_SRVF_nDim" />
+      <config projectName="DP_Shape_Match_func_nDim" targetName="DP_Shape_Match_Coord_nDim" />
+    </generated>
+  </component>
+  <component name="CMakeSettings">
+    <configurations>
+      <configuration PROFILE_NAME="Debug" CONFIG_NAME="Debug" />
+      <configuration PROFILE_NAME="Release" CONFIG_NAME="Release" />
+    </configurations>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="68c156c3-6565-4ebb-8d7b-8aea5324825f" name="Default Changelist" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="DatabaseView">
+    <option name="SHOW_INTERMEDIATE" value="true" />
+    <option name="GROUP_DATA_SOURCES" value="true" />
+    <option name="GROUP_SCHEMA" value="true" />
+    <option name="GROUP_CONTENTS" value="false" />
+    <option name="SORT_POSITIONED" value="false" />
+    <option name="SHOW_EMPTY_GROUPS" value="false" />
+    <option name="AUTO_SCROLL_FROM_SOURCE" value="false" />
+    <option name="HIDDEN_KINDS">
+      <set />
+    </option>
+    <expand />
+    <select />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Release" />
+  <component name="ProjectId" id="1Z8dfQFcBcDmUPFmu08iP2Uf4tT" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.detected.package.tslint" value="true" />
+    <property name="node.js.path.for.package.eslint" value="project" />
+    <property name="node.js.path.for.package.tslint" value="project" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
+    <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
+  </component>
+  <component name="RunManager" selected="CMake Application.DP_Shape_Match_Coord_nDim">
+    <configuration name="DP_Shape_Match_Coord_nDim" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="DP_Shape_Match_func_nDim" TARGET_NAME="DP_Shape_Match_Coord_nDim" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="DP_Shape_Match_func_nDim" RUN_TARGET_NAME="DP_Shape_Match_Coord_nDim">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="DP_Shape_Match_SRVF_nDim" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="DP_Shape_Match_func_nDim" TARGET_NAME="DP_Shape_Match_SRVF_nDim" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="DP_Shape_Match_func_nDim" RUN_TARGET_NAME="DP_Shape_Match_SRVF_nDim">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="CMake Application.DP_Shape_Match_Coord_nDim" />
+      <item itemvalue="CMake Application.DP_Shape_Match_SRVF_nDim" />
+    </list>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="68c156c3-6565-4ebb-8d7b-8aea5324825f" name="Default Changelist" comment="" />
+      <created>1584224757947</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1584224757947</updated>
+      <workItem from="1584224759246" duration="43000" />
+      <workItem from="1584224846522" duration="13688000" />
+      <workItem from="1584338758146" duration="98000" />
+      <workItem from="1584754248202" duration="371000" />
+      <workItem from="1584760870723" duration="320000" />
+      <workItem from="1584763551869" duration="74000" />
+      <workItem from="1593901065496" duration="2654000" />
+      <workItem from="1594001736259" duration="1067000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="391" y="176" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1593902469741">
+      <screen x="0" y="23" width="1680" height="981" />
+    </state>
+    <state x="391" y="176" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.23.1680.981@0.23.1680.981" timestamp="1593902469741" />
+    <state width="1465" height="244" key="GridCell.Tab.0.bottom" timestamp="1593920731999">
+      <screen x="0" y="23" width="1680" height="981" />
+    </state>
+    <state width="1465" height="244" key="GridCell.Tab.0.bottom/0.23.1680.981@0.23.1680.981" timestamp="1593920731999" />
+    <state width="1465" height="244" key="GridCell.Tab.0.center" timestamp="1593920731998">
+      <screen x="0" y="23" width="1680" height="981" />
+    </state>
+    <state width="1465" height="244" key="GridCell.Tab.0.center/0.23.1680.981@0.23.1680.981" timestamp="1593920731998" />
+    <state width="1465" height="244" key="GridCell.Tab.0.left" timestamp="1593920731997">
+      <screen x="0" y="23" width="1680" height="981" />
+    </state>
+    <state width="1465" height="244" key="GridCell.Tab.0.left/0.23.1680.981@0.23.1680.981" timestamp="1593920731997" />
+    <state width="1465" height="244" key="GridCell.Tab.0.right" timestamp="1593920731999">
+      <screen x="0" y="23" width="1680" height="981" />
+    </state>
+    <state width="1465" height="244" key="GridCell.Tab.0.right/0.23.1680.981@0.23.1680.981" timestamp="1593920731999" />
+    <state x="435" y="152" key="SettingsEditor" timestamp="1593920719158">
+      <screen x="0" y="23" width="1680" height="981" />
+    </state>
+    <state x="435" y="152" key="SettingsEditor/0.23.1680.981@0.23.1680.981" timestamp="1593920719158" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/src/DP_Shape_Match_func_nDim.cpp</url>
+          <line>31</line>
+          <option name="timeStamp" value="3" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/src/DP_Shape_Match_func_nDim.cpp</url>
+          <line>14</line>
+          <option name="timeStamp" value="4" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+</project>

@@ -1,8 +1,8 @@
 import numpy as np 
-from scipy.interpolate import interp1d
 import struct
 import os
-
+from scipy.interpolate import interp1d
+from scipy.integrate import cumtrapz
 def inner_product_L2(u, v):
 	'''
 	Computes the standard inner product on L2
@@ -18,7 +18,7 @@ def inner_product_L2(u, v):
 
 	return np.trapz(np.sum(np.multiply(u, v), axis = 0), D)
 
-def induced_norm_L2(u, D = None):
+def induced_norm_L2(u):
 	'''
 	Computes the norm induced by the standard L2 inner product
 	- u: An (n x T) matrix representation of the function u: D -> R^n
@@ -28,46 +28,108 @@ def induced_norm_L2(u, D = None):
 
 	return np.sqrt(inner_product_L2(u, u))
 
-def form_basis_normal_A(q):
+def project_B(q):
 	'''
-	Returns vector field that forms the basis for normal space of cal(A)
-	Input:
-	- q: An (n x T) matrix representation of the SRVF q: [0,2pi] -> R^n
-	Output:
-	- del_g: An (n x n x T) array representing the vector field
+	Projects given point in L2 onto unit Hilbert sphere in L2
+	Inputs: 
+	- q: An (n x T) matrix representation of the SRVF of function p: D -> R^n
+	- D: A vector denoting the domain of the curve, i.e., p: D -> R^n. If none, will
+		 take D = [0, 2pi] discretized into T points
+	Outputs:
+	An (n x T) matrix representation of q projected on the Hilbert sphere
 	'''
-	n, T = np.shape(q)
-	e = np.eye(n)
-	ev = []
-
-	for i in range(n):
-		ev.append( np.tile(e[:, i], (T, 1)).transpose())
-		qnorm = np.zeros(T)
-
-	qnorm = np.linalg.norm(q, 2, axis = 0)
-
-	del_g = np.zeros((n, n, T))
-	for i in range(n):
-		tmp1 = np.tile((q[i, :] / qnorm), (n, 1))
-		tmp2 = np.tile(qnorm, (n, 1))
-		del_g[i] = tmp1*q + tmp2*ev[i]
-	return del_g
-
-def form_basis_D(d, T):
+	eps = 1e-8
+	return q/(induced_norm_L2(q, D) + eps)
+	
+def curve_to_q(p, shape = None):
 	''' 
-	Returns the basis for the tangent space of diffeomorphisms
+	Given a curve p, gets the SRVF representation
 	Inputs:
-	- d: A nonnegative integer
-	- T: A nonnegative integer
-	Ouputs:
-	- V: A (2d x 10) matrix representing the basis
+	- p: An (n x T) matrix representation of the function p: D -> R^n
+	- shape: A vector denoting the size of p, i.e., [n, T]. If none given,
+			 will determine shape of p. Used to speed up batch processing
+	Outputs:
+	An (n x T) matrix representation of the SRVF of p
 	'''
-	x = np.reshape(np.linspace(0, 2*np.pi, T, True), (1, T))
-	vec = np.reshape(np.arange(1, d+1), (1, d))
-	x_d_arr = np.matmul(vec.T, x)
-	V = np.vstack([np.cos(x_d_arr)/np.sqrt(np.pi), np.sin(x_d_arr)/np.sqrt(np.pi)])
-	return V
+	if shape is None:
+		n, T = np.shape(p)
+	else:
+		n, T = shape
 
+	D = np.linspace(0, 2*np.pi, T, True)
+
+	beta_dot = np.zeros((n,T))
+	q = np.zeros((n,T))
+
+	for i in range(n):
+		beta_dot[i,:] = np.gradient(p[i,:], D)
+
+	eps = np.finfo(float).eps
+	for i in range(T):
+		q[:,i] = beta_dot[:,i]/(np.sqrt(np.linalg.norm(beta_dot[:,i])) + eps)
+
+	q = project_B(q)
+
+	return q
+
+def batch_curve_to_q(curves):
+	''' 
+	Given a collection of curves, gets their SRVF representation. Assumes that all
+	matrix representations of the curves are of the same size. 
+	Inputs:
+	- curves: A (N x n x T) list of matrices.
+	Outputs:
+	A (N x n x T) list of matrices where the ith element is the SRVF representation
+	of the ith curve in curves.
+	'''
+	N, n, T = np.shape(curves)
+
+	return [curve_to_q(p_i, [n, T]) for p_i in curves]
+
+def q_to_curve(q):
+	''' 
+	Given an SRVF curve q, recovers original curve
+	Inputs:
+	- q: An (n x T) matrix representation of the SRVF q: D -> R^n
+	Outputs:
+	An (n x T) matrix representation of the original curve
+	'''
+	
+	n, T = np.shape(q)
+	D = np.linspace(0, 2*np.pi, T, True)
+
+	q_norms = np.linalg.norm(q, axis = 0)
+	p = np.zeros((n,T))
+
+	for i in range(n):
+		p[i,:] = cumtrapz(np.multiply(q[i,:], q_norms), D, initial = 0)
+
+	return p
+
+def find_best_rotation(q1, q2):
+	'''
+	Solves Procrusted problem to find optimal rotation
+	Inputs:
+	- q1: An (n x T) matrix
+	- q2: An (n x T) matrix
+	Outputs:
+	- q2n: An (n x T) matrix representing the rotated q2
+	- R: An (n x n) matrix representing the rotation matrix
+	'''
+
+	n, T = np.shape(q1)
+	A = np.matmul(q1, q2.T)
+	[U, S, V] = np.linalg.svd(A)
+
+	S = np.eye(n)
+	if (np.abs(np.linalg.det(U)*np.linalg.det(V) - 1) > 10*np.spacing(1)):
+		S[:,-1] = -S[:,-1]
+
+	R = np.matmul(U, np.matmul(S, V.T))
+	q2n = np.matmul(R, q2)
+
+	return q2n, R
+	
 def shiftF(p, tau):
 	''' 
 	Shifts the elements in the matrix p tau indices to the left 
@@ -139,7 +201,8 @@ def load_gamma(filename):
 
 	gamma = []
 	with open(filename, 'rb') as fid:
-		gamma = np.fromfile(fid, '<f4', offset = 4) # Skip first byte containing T
+		# Skip first byte containing T. Assume little-endian
+		gamma = np.fromfile(fid, '<f4', offset = 4) 
 		fid.close()
 
 	return gamma
@@ -186,3 +249,31 @@ def initialize_gamma_using_DP(q1, q2):
 
 	# Call to get gamma
 	os.system('./DP_Shape_Match_SRVF_nDim DPshapedata.dat gamma.dat')
+
+	gamma - load_gamma('gamma.dat')
+	q2n = group_action_by_gamma(q2, gamma)
+
+	return q2n, gamma
+
+def estimate_gamma(q):
+	'''
+	Estimate warping function given curve
+	Inputs:
+	- q: An (n x T) matrix
+	Outputs:
+	- gamma: A T-dimensional vector representing a diffeomorphism
+	'''
+
+	p = q_to_curve(q)
+	n, T = np.shape(p)
+
+	# Evaluate arc-length formula
+	pdiff = np.diff(p, 1)
+	ds = T*np.sqrt(np.sum(np.square(pdiff), axis = 0))
+	ds_cumsum = np.cumsum(ds)
+	gamma = 2*np.pi*ds_cumsum/np.max(ds_cumsum)
+
+	return gamma
+
+
+

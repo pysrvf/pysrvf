@@ -1,7 +1,6 @@
 import numpy as np
 from generic_utils import *
 from form_basis_utils import *
-from scipy.integrate import trapz
 
 def geodesic_Q(q1, q2, stp):
 	'''
@@ -67,7 +66,7 @@ def path_length(alpha_t):
 	for i in range(k):
 		v_norm[i] = induced_norm_L2(alpha_t[i])
 
-	L = trapz(v_norm, s)
+	L = np.trapz(v_norm, s)
 
 	return L
 
@@ -87,7 +86,7 @@ def palais_inner_product(v1, v2):
 	for i in range(k):
 		v_inner[i] = inner_product_L2(v1[i], v2[i])
 
-	val = trapz(v_inner, s)
+	val = np.trapz(v_inner, s)
 
 	return val
 

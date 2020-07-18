@@ -3,6 +3,7 @@ import struct
 import os
 from scipy.interpolate import interp1d
 from scipy.integrate import cumtrapz
+
 def inner_product_L2(u, v):
 	'''
 	Computes the standard inner product on L2
@@ -39,7 +40,7 @@ def project_B(q):
 	An (n x T) matrix representation of q projected on the Hilbert sphere
 	'''
 	eps = 1e-8
-	return q/(induced_norm_L2(q, D) + eps)
+	return q/(induced_norm_L2(q) + eps)
 	
 def curve_to_q(p, shape = None):
 	''' 
@@ -116,7 +117,6 @@ def find_best_rotation(q1, q2):
 	- q2n: An (n x T) matrix representing the rotated q2
 	- R: An (n x n) matrix representing the rotation matrix
 	'''
-
 	n, T = np.shape(q1)
 	A = np.matmul(q1, q2.T)
 	[U, S, V] = np.linalg.svd(A)
@@ -129,7 +129,7 @@ def find_best_rotation(q1, q2):
 	q2n = np.matmul(R, q2)
 
 	return q2n, R
-	
+
 def shiftF(p, tau):
 	''' 
 	Shifts the elements in the matrix p tau indices to the left 
@@ -140,6 +140,31 @@ def shiftF(p, tau):
 	An (n x T) matrix with the columns shifted to the left by tau units
 	'''
 	return np.roll(p, -np.abs(tau), axis = 1)
+
+def find_rotation_and_seed_unique(q1, q2):
+	'''
+	Finds locally optimal rotatino and seed point for q2 wrt q1
+	Inputs:
+	- q1: An (n x T) matrix
+	- q2: An (n x T) matrix
+	Outputs:
+	- q2new: An (n x T) matrix representing the rotated q2
+	'''
+	n, T = np.shape(q1)
+	L2_norm = []
+	R_arr = []
+	for ctr in range(T+1):
+		q2n = shiftF(q2, ctr)
+		q2new, R = find_best_rotation(q1, q2n)
+		L2_norm.append(induced_norm_L2(q1 - q2new)**2)
+		R_arr.append(R)
+
+	L2_norm_amin = np.argmin(L2_norm)
+	L2_norm_min = L2_norm[L2_norm_amin]
+	q2new = shiftF(q2, L2_norm_amin)
+	q2new = np.matmul(R_arr[L2_norm_amin], q2new)
+
+	return q2new
 
 def regroup(q1, q2):
 	'''
@@ -250,7 +275,8 @@ def initialize_gamma_using_DP(q1, q2):
 	# Call to get gamma
 	os.system('./DP_Shape_Match_SRVF_nDim DPshapedata.dat gamma.dat')
 
-	gamma - load_gamma('gamma.dat')
+	gamma = load_gamma('gamma.dat')
+	gamma = 2*np.pi*gamma/np.max(gamma)
 	q2n = group_action_by_gamma(q2, gamma)
 
 	return q2n, gamma

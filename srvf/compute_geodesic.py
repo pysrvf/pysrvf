@@ -20,14 +20,14 @@ def compute_geodesic_C(q0, q1, stp, dt):
 	     for each alpha_t iteration 
 	- L: The length of the geodesic
 	'''
-	q1 = regroup(q0, q1)
-	q1 = projectC(q1)
+	q1 = projectC(regroup(q0, q1))
 
 	# Initialize path in C by forming a geodesic in Q
 	alpha = geodesic_Q(q0, q1, stp)
 
 	itr = 1
-	E = [1000]
+	# E = [1000]
+	E = []
 	v_norm = 100
 
 
@@ -72,7 +72,7 @@ def compute_geodesic_C_factor_D(q1, q2, stp, d, dt):
 
 	q2n, _ = initialize_gamma_using_DP(q1, q2)
 
-	if induced_norm_L2(q1 - q2n)**2 < epsilon/15:
+	if (induced_norm_L2(q1 - q2n)**2) < epsilon/15:
 		A_norm_iter = 0
 		E_geo_C = 0
 		gamma = s
@@ -87,7 +87,7 @@ def compute_geodesic_C_factor_D(q1, q2, stp, d, dt):
 	E_geo_C = []
 	A_norm_iter = []
 	L_iter = []
-	while (itr < 45) and (diffL > epsilon/50):
+	while (itr < 44) and (diffL > epsilon/50):
 		q2n = regroup(q1, q2n)
 		q2n = projectC(q2n)
 		alpha, alpha_t, E, L = compute_geodesic_C(q1, q2n, stp, dt)
@@ -95,7 +95,7 @@ def compute_geodesic_C_factor_D(q1, q2, stp, d, dt):
 		E_geo_C.append(E[-1])
 		u = alpha_t[stp]
 		D_q = form_basis_D_q(V, q2n)
-		u_proj, a = project_tgt_D_q(u, D_q)
+		u_proj, a = project_tgt_D_q(u, D_q) # Need to check this
 		g = np.matmul(a, V)
 		A_norm_iter.append(trapz(np.square(g), s))
 
@@ -146,7 +146,7 @@ def compute_elastic_geodesic(q1, q2, stp, d, dt, data_reg_flag):
 		q2, _ = find_best_rotation(q1, q2)
 		alpha, alpha_t, A_norm_iter, E_geo_C, gamma, geo_dist = compute_geodesic_C_factor_D(q1, q2, stp, d, dt)
 	elif data_reg_flag == 'nonreg':
-		q2 - regroup(q1, q2)
+		q2 = regroup(q1, q2)
 		q2new = find_rotation_and_seed_unique(q1, q2)
 		alpha, alpha_t, A_norm_iter, E_geo_C, gamma, geo_dist = \
 		compute_geodesic_C_factor_D(q1, q2new, stp, d, dt)
@@ -171,17 +171,17 @@ def geodesic_distance_all(qarr, computation_type):
 
 	if computation_type == 'all':
 		for i in range(num_shapes):
+			q1 = qarr[i]
 			for j in np.arange(i+1, num_shapes):
-				q1 = qarr[i]
 				q2 = qarr[j]
 				alpha, alpha_t, A_norm_iter, E_geo_C, gamma, geo_dist = \
 				compute_elastic_geodesic(q1, q2, stp, d, dt, 'nonreg')
-				# alpha_arr.append(alpha)
-				# alpha_t_arr.append(alpha_t)
-				# A_norm_iter_arr.append(A_norm_iter)
-				# E_geo_C_arr.append(E_geo_C)
-				# gamma_arr.append(gamma)
-				# geo_dist_arr.append(geo_dist)
+				alpha_arr.append(alpha)
+				alpha_t_arr.append(alpha_t)
+				A_norm_iter_arr.append(A_norm_iter)
+				E_geo_C_arr.append(E_geo_C)
+				gamma_arr.append(gamma)
+				geo_dist_arr.append(geo_dist)
 				print('{}--{}, {}'.format(i+1, j+1, geo_dist))
 	elif computation_type == 'pairwise':
 		# Check if array has even number of elements
@@ -191,13 +191,13 @@ def geodesic_distance_all(qarr, computation_type):
 				q2 = qarr[i+1]
 				alpha, alpha_t, A_norm_iter, E_geo_C, gamma, geo_dist = \
 				compute_elastic_geodesic(q1, q2, stp, d, dt, 'nonreg')
-				# alpha_arr.append(alpha)
-				# alpha_t_arr.append(alpha_t)
-				# A_norm_iter_arr.append(A_norm_iter)
-				# E_geo_C_arr.append(E_geo_C)
-				# gamma_arr.append(gamma)
-				# geo_dist_arr.append(geo_dist)
-				print('{}--{}, {}'.format(i+1, j+1, geo_dist))
+				alpha_arr.append(alpha)
+				alpha_t_arr.append(alpha_t)
+				A_norm_iter_arr.append(A_norm_iter)
+				E_geo_C_arr.append(E_geo_C)
+				gamma_arr.append(gamma)
+				geo_dist_arr.append(geo_dist)
+				print('{}--{}, {}'.format(i+1, i+2, geo_dist))
 		else:
 			print('For the selected option: {},'.format(computation_type) + \
 				' qarr should contain an even number of elements.')

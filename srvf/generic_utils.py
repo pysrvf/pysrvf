@@ -14,10 +14,9 @@ def inner_product_L2(u, v):
 	<u,v> = int_[0,2pi] (u(t)v(t))_R^n dt
 	'''
 
-	n, T = np.shape(u)
-	D = np.linspace(0, 2*np.pi, T, True)
+	_, T = np.shape(u)
 
-	return np.trapz(np.sum(np.multiply(u, v), axis = 0), D)
+	return np.trapz(np.sum(np.multiply(u, v), axis = 0), dx = 2*np.pi/(T-1))
 
 def induced_norm_L2(u):
 	'''
@@ -28,6 +27,86 @@ def induced_norm_L2(u):
 	'''
 
 	return np.sqrt(inner_product_L2(u, u))
+
+def form_basis_normal_A(q):
+	'''
+	Returns vector field that forms the basis for normal space of cal(A)
+	Input:
+	- q: An (n x T) matrix representation of the SRVF q: [0,2pi] -> R^n
+	Output:
+	- del_g: An (n x n x T) array representing the vector field
+	'''
+	n, T = np.shape(q)
+	e = np.eye(n)
+	ev = []
+
+	for i in range(n):
+		ev.append(np.tile(np.reshape(e[:, i], (n,1)), (1, T)))
+
+	qnorm = np.linalg.norm(q, 2, axis = 0)
+
+	del_g = np.zeros((n, n, T))
+	for i in range(n):
+		tmp1 = np.tile(np.divide(q[i,:], qnorm), (n, 1))
+		tmp2 = np.tile(qnorm, (n, 1))
+		del_g[i] = np.multiply(tmp1, q) + np.multiply(tmp2, ev[i])
+	return del_g
+
+def projectC(q):
+    ''' 
+    Projects the given SRVF curve onto the space of closed curves
+    Inputs:
+    - q: An (n x T) matrix representing the SRVF representation of a curve
+    Outputs:
+    - qnew: An (n x T) matrix representing the SRVF of a closed curve
+    '''
+    n, T = np.shape(q)
+    dt = 0.3
+    epsilon = (1.0/60.0)*(2.0*np.pi/T)
+
+    k = 0
+    res = np.ones((1,n))
+    J = np.zeros((n, n))
+    
+    eps = np.spacing(1)
+    qnew = q/(induced_norm_L2(q) + eps)
+
+    while(np.linalg.norm(res, 2) > epsilon):
+        if k > 300:
+            warnings.warn('Shape failed to project. Geodesics will be incorrect.')
+            break
+
+        # Compute Jacobian
+        for i in range(n):
+            for j in range(n):
+                J[i, j] = 3*np.trapz(np.multiply(qnew[i, :], qnew[j, :]), dx = 2*np.pi/(T-1))
+        J += np.eye(n)
+
+        qnorm = np.linalg.norm(qnew, 2, axis = 0)
+
+        # Compute residue
+        res = [-np.trapz(np.multiply(qnew[i,:], qnorm), dx = 2*np.pi/(T-1)) for i in range(n)]
+
+        if np.linalg.norm(res, 2) < epsilon:
+            break
+
+        J_cond = np.linalg.cond(J)
+
+        if np.isnan(J_cond) or np.isinf(J_cond) or (J_cond < 0.1):
+            warnings.warn('Projection may not be accurate.')
+            return q/(induced_norm_L2(q) + eps)
+        else:
+            x = np.linalg.solve(J, res)
+            del_G = form_basis_normal_A(qnew)
+            temp = 0
+            for i in range(n):
+                temp += x[i]*del_G[i]*dt
+            qnew += temp
+            k += 1
+
+    qnew = qnew/induced_norm_L2(qnew)
+    
+    return qnew
 
 def project_B(q):
 	'''
@@ -57,19 +136,18 @@ def curve_to_q(p, shape = None):
 	else:
 		n, T = shape
 
-	D = np.linspace(0, 2*np.pi, T, True)
-
 	beta_dot = np.zeros((n,T))
 	q = np.zeros((n,T))
 
 	for i in range(n):
-		beta_dot[i,:] = np.gradient(p[i,:], D)
+		beta_dot[i,:] = np.gradient(p[i,:], 2*np.pi/(T-1))
 
 	eps = np.finfo(float).eps
 	for i in range(T):
 		q[:,i] = beta_dot[:,i]/(np.sqrt(np.linalg.norm(beta_dot[:,i])) + eps)
 
-	q = project_B(q)
+	# q = project_B(q)
+	q = projectC(q)
 
 	return q
 
@@ -97,13 +175,12 @@ def q_to_curve(q):
 	'''
 	
 	n, T = np.shape(q)
-	D = np.linspace(0, 2*np.pi, T, True)
 
 	q_norms = np.linalg.norm(q, axis = 0)
 	p = np.zeros((n,T))
 
 	for i in range(n):
-		p[i,:] = cumtrapz(np.multiply(q[i,:], q_norms), D, initial = 0)
+		p[i,:] = cumtrapz(np.multiply(q[i,:], q_norms), dx = 2*np.pi/(T-1), initial = 0)
 
 	return p
 
@@ -187,7 +264,7 @@ def regroup(q1, q2):
 	idx = np.argmin(E)
 	Emin = E[idx]
 	q2n = shiftF(q2, idx)
-
+	
 	return q2n
 
 def save_q_shapes(filename, qarr):
@@ -224,11 +301,16 @@ def load_gamma(filename):
 	- gamma: A T-dimensional vector
 	'''
 
-	gamma = []
-	with open(filename, 'rb') as fid:
-		# Skip first byte containing T. Assume little-endian
-		gamma = np.fromfile(fid, '<f4', offset = 4) 
-		fid.close()
+	# gamma = []
+	# with open(filename, 'rb') as fid:
+	# 	# Skip first byte containing T. Assume little-endian
+	# 	gamma = np.fromfile(fid, '<f4', offset = 4) 
+	# 	fid.close()
+
+	f = open(filename, 'rb')
+	T = struct.unpack('i', f.read(4))[0]
+	gamma = np.array(struct.unpack('f'*T,  f.read()))
+	f.close()
 
 	return gamma
 
@@ -300,6 +382,3 @@ def estimate_gamma(q):
 	gamma = 2*np.pi*ds_cumsum/np.max(ds_cumsum)
 
 	return gamma
-
-
-

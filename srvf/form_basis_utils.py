@@ -1,31 +1,7 @@
 import numpy as np
 import warnings
-from generic_utils import induced_norm_L2
-from generic_utils import inner_product_L2
+from generic_utils import *
 
-def form_basis_normal_A(q):
-	'''
-	Returns vector field that forms the basis for normal space of cal(A)
-	Input:
-	- q: An (n x T) matrix representation of the SRVF q: [0,2pi] -> R^n
-	Output:
-	- del_g: An (n x n x T) array representing the vector field
-	'''
-	n, T = np.shape(q)
-	e = np.eye(n)
-	ev = []
-
-	for i in range(n):
-		ev.append(np.tile(np.reshape(e[:, i], (n,1)), (1, T)))
-
-	qnorm = np.linalg.norm(q, 2, axis = 0)
-
-	del_g = np.zeros((n, n, T))
-	for i in range(n):
-		tmp1 = np.tile(np.divide(q[i,:], qnorm), (n, 1))
-		tmp2 = np.tile(qnorm, (n, 1))
-		del_g[i] = np.multiply(tmp1, q) + np.multiply(tmp2, ev[i])
-	return del_g
 
 def form_basis_D(d, T):
 	''' 
@@ -87,71 +63,13 @@ def project_tgt_D_q(u, D_q):
 
 	return u_proj, a
 
-def projectC(q):
-    ''' 
-    Projects the given SRVF curve onto the space of closed curves
-    Inputs:
-    - q: An (n x T) matrix representing the SRVF representation of a curve
-    Outputs:
-    - qnew: An (n x T) matrix representing the SRVF of a closed curve
-    '''
-
-    n, T = np.shape(q)
-    D = np.linspace(0, 2*np.pi, T)
-    dt = 0.3
-    epsilon = (1.0/60.0)*(2.0*np.pi/T)
-
-    k = 0
-    res = np.ones((1,n))
-    J = np.zeros((n, n))
-    
-    eps = np.spacing(1)
-    qnew = q/(induced_norm_L2(q) + eps)
-
-    while(np.linalg.norm(res, 2) > epsilon):
-        if k > 300:
-            warnings.warn('Shape failed to project. Geodesics will be incorrect.')
-            break
-
-        # Compute Jacobian
-        for i in range(n):
-            for j in range(n):
-                J[i, j] = 3*np.trapz(np.multiply(qnew[i, :], qnew[j, :]), D)
-        J += np.eye(n)
-
-        qnorm = np.linalg.norm(qnew, 2, axis = 0)
-
-        # Compute residue
-        res = [-np.trapz(np.multiply(qnew[i,:], qnorm), D) for i in range(n)]
-
-        if np.linalg.norm(res, 2) < epsilon:
-            break
-
-        J_cond = np.linalg.cond(J)
-
-        if np.isnan(J_cond) or np.isinf(J_cond) or (J_cond < 0.1):
-            warnings.warn('Projection may not be accurate.')
-            return q/(induced_norm_L2(q) + eps)
-        else:
-            x = np.linalg.solve(J, res)
-            del_G = form_basis_normal_A(qnew)
-            temp = 0
-            for i in range(n):
-                temp += x[i]*del_G[i]*dt
-            qnew += temp
-            k += 1
-
-    qnew = qnew/induced_norm_L2(qnew)
-    
-    return qnew
-
 def gram_schmidt(X):
 	'''
 	Applies Gram-schmidt orthonormalization to X with L2 inner product
 	Inputs:
-	- X: An (m x n) matrix
+	- X: An (N x n x T) matrix
 	Outputs:
-	- Y: An (m x n) matrix with orthonormal columns (wrt L2 inner product)
+	- Y: An (N x n x T) matrix with orthonormal columns (wrt L2 inner product)
 	'''
 	epsilon = 5e-6
 	N, n, T = np.shape(X)
@@ -191,18 +109,14 @@ def project_tangent(f, q):
 	n, T = np.shape(q)
 
 	# Project w in T_q(C(B))
-	w = f - np.multiply(inner_product_L2(f, q), q)
-	e = np.eye(n)
+	w = f - inner_product_L2(f, q)*q
 
 	# Get basis for normal space of C(A)
 	g = form_basis_normal_A(q)
 
 	Ev = gram_schmidt(g)
 
-	s = np.zeros_like(Ev[0])
-
-	for i in range(n):
-		s += inner_product_L2(w, Ev[i])*Ev[i]
+	s = np.sum(inner_product_L2(w, Ev_i)*Ev_i for Ev_i in Ev)
 
 	fnew = w - s
 

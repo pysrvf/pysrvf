@@ -14,22 +14,21 @@ def geodesic_Q(q1, q2, stp):
 	'''
 	n, T = np.shape(q1)
 	ip_L2 = inner_product_L2(q1, q2)
-	if ip_L2 > 1:
-		ip_L2 = 1
+	# if ip_L2 > 1:
+	# 	ip_L2 = 1
 
-	if ip_L2 < -1:
-		ip_L2 = -1
+	# if ip_L2 < -1:
+	# 	ip_L2 = -1
 	
 	theta = np.arccos(ip_L2)
 	alpha_new = np.zeros((stp + 1, n, T))
-	eps = np.spacing(1)
 	
 	for tau in range(stp+1):
 		t = tau/stp
 		if theta < 1e-4:
 			alpha_new[tau] = q1
 		else:
-			alpha_new[tau] = projectC((np.sin(theta-t*theta)*q1 + np.sin(t*theta)*q2)/(np.sin(theta)+eps))
+			alpha_new[tau] = projectC((np.sin(theta-t*theta)*q1 + np.sin(t*theta)*q2)/np.sin(theta))
 
 	return alpha_new
 
@@ -44,7 +43,7 @@ def dAlpha_dt(alpha):
 	k, n, T = np.shape(alpha)
 	stp = k-1
 	alpha_t = np.zeros_like(alpha)
-
+	
 	for tau in np.arange(1, k):
 		alpha_t[tau] = stp*(alpha[tau] - alpha[tau-1])
 		alpha_t[tau] = project_tangent(alpha_t[tau], alpha[tau])
@@ -60,13 +59,9 @@ def path_length(alpha_t):
 	- L: A nonnegative scalar representing the length of alpha_t
 	'''
 	k, _, _ = np.shape(alpha_t)
-	s = np.linspace(0, 1, k)
-	v_norm = np.zeros(k)
-	
-	for i in range(k):
-		v_norm[i] = induced_norm_L2(alpha_t[i])
 
-	L = np.trapz(v_norm, s)
+	v_norm = [induced_norm_L2(alpha_t[i]) for i in range(k)]
+	L = np.trapz(v_norm, dx = 1.0/(k-1))
 
 	return L
 
@@ -80,13 +75,9 @@ def palais_inner_product(v1, v2):
 	- val: A scalar representing the ... inner product of v1 and v2
 	'''
 	k, n, T = np.shape(v1)
-	s = np.linspace(0, 1, k)
-	v_inner = np.zeros(k)
 
-	for i in range(k):
-		v_inner[i] = inner_product_L2(v1[i], v2[i])
-
-	val = np.trapz(v_inner, s)
+	v_inner = [inner_product_L2(v1[i], v2[i]) for i in range(k)]
+	val = np.trapz(v_inner, dx = 1.0/(k-1))
 
 	return val
 
@@ -149,8 +140,7 @@ def cov_int_alpha_t(alpha, alpha_t):
 
 	for tau in np.arange(1, k):
 		w_prev = parallel_transport_C(w[tau-1], alpha[tau-1], alpha[tau])
-		w[tau] = w_prev + alpha_t[tau]/stp
-		w[tau] = project_tangent(w[tau], alpha[tau])
+		w[tau] = project_tangent(w_prev + alpha_t[tau]/stp, alpha[tau])
 
 	return w
 
@@ -166,12 +156,8 @@ def cov_derivative(w, q):
 	k, n, T = np.shape(q)
 	stp = k-1
 
-	w_t = np.zeros_like(w)
 	w_t_cov = np.zeros_like(w)
-
-	for tau in np.arange(1, k):
-		w_t[tau] = stp*(w[tau] - w[tau-1])
-		w_t_cov[tau] = project_tangent(w_t[tau], q[tau])
+	w_t_cov[tau] = [project_tangent(stp*(w[i] - w[i-1]), q[i]) for i in np.arange(1, k)]
 
 	return w_t_cov
 
@@ -205,10 +191,35 @@ def path_update(alpha, v, dt):
 	stp = k-1
 	alpha_new = np.zeros_like(alpha)
 
-	for tau in range(k):
-		if induced_norm_L2(v[tau]) < 1e-4:
-			alpha_new[tau] = alpha[tau]
-		else:
-			alpha_new[tau] = projectC(geodesic_sphere(alpha[tau], v[tau], dt))
+	alpha_new = [alpha[i] if (induced_norm_L2(v[i]) < 1e-4) else \
+		projectC(geodesic_sphere(alpha[i], v[i], dt)) for i in range(k)]
 
 	return alpha_new
+
+def geodesic_flow(q1, w, stp):
+	'''
+	Compute ...
+	Inputs:
+	- q1: An (n x T) matrix
+	- w: An (n x T) matrix representing mean geodesic
+	- stp: An integer
+	Outputs:
+	- qt: An (n x T) matrix
+	- alpha: A (stp+1 x n x T) array
+	'''
+	n, T = np.shape(q1)
+	qt = q1
+	w_norm = induced_norm_L2(w)
+	alpha = []
+	alpha.append(q1)
+
+	if w_norm < 1e-3:
+		return qt, alpha
+
+	for i in range(stp):
+		qt = projectC(qt + w/stp)
+		alpha.append(qt)
+		w = project_tangent(w, qt)
+		w = w_norm*w/induced_norm_L2(w)
+
+	return qt, alpha

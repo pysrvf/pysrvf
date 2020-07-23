@@ -32,11 +32,12 @@ def geodesic_Q(q1, q2, stp):
 
 	return alpha_new
 
-def dAlpha_dt(alpha):
+def dAlpha_dt(alpha, is_closed):
 	'''
 	Computes the derivative of the given alpha
 	Inputs:
 	- alpha: A (k x n x T) array representing a geodesic
+	- is_closed: A boolean indicating whether the original curves are closed
 	Outputs:
 	- alpha_t: A (k x n x T) array representing the derivative of alpha
 	'''
@@ -46,7 +47,7 @@ def dAlpha_dt(alpha):
 	
 	for tau in np.arange(1, k):
 		alpha_t[tau] = stp*(alpha[tau] - alpha[tau-1])
-		alpha_t[tau] = project_tangent(alpha_t[tau], alpha[tau])
+		alpha_t[tau] = project_tangent(alpha_t[tau], alpha[tau], is_closed)
 
 	return alpha_t
 
@@ -96,7 +97,7 @@ def parallel_transport_C(w, q1, q2):
 	w_new = w
 
 	if w_norm > 1e-4:
-		w_new = project_tangent(w, q2)
+		w_new = project_tangent(w, q2, True)
 		w_new = w_norm*w_new/induced_norm_L2(w_new)
 
 	return w_new
@@ -140,7 +141,7 @@ def cov_int_alpha_t(alpha, alpha_t):
 
 	for tau in np.arange(1, k):
 		w_prev = parallel_transport_C(w[tau-1], alpha[tau-1], alpha[tau])
-		w[tau] = project_tangent(w_prev + alpha_t[tau]/stp, alpha[tau])
+		w[tau] = project_tangent(w_prev + alpha_t[tau]/stp, alpha[tau], True)
 
 	return w
 
@@ -196,13 +197,14 @@ def path_update(alpha, v, dt):
 
 	return alpha_new
 
-def geodesic_flow(q1, w, stp):
+def geodesic_flow(q1, w, stp, is_closed):
 	'''
 	Compute ...
 	Inputs:
 	- q1: An (n x T) matrix
 	- w: An (n x T) matrix representing mean geodesic
 	- stp: An integer
+	- is_closed: A boolean indicating whether the original curves are closed
 	Outputs:
 	- qt: An (n x T) matrix
 	- alpha: A (stp+1 x n x T) array
@@ -217,9 +219,12 @@ def geodesic_flow(q1, w, stp):
 		return qt, alpha
 
 	for i in range(stp):
-		qt = projectC(qt + w/stp)
+		if is_closed:
+			qt = projectC(qt + w/stp)
+		else:
+			qt = project_B(qt + w/stp)
 		alpha.append(qt)
-		w = project_tangent(w, qt)
+		w = project_tangent(w, qt, is_closed)
 		w = w_norm*w/induced_norm_L2(w)
 
 	return qt, alpha

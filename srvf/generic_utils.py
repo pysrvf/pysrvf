@@ -118,16 +118,17 @@ def project_B(q):
 	Outputs:
 	An (n x T) matrix representation of q projected on the Hilbert sphere
 	'''
-	eps = 1e-8
-	return q/(induced_norm_L2(q) + eps)
 	
-def curve_to_q(p, shape = None):
+	return q/induced_norm_L2(q) 
+	
+def curve_to_q(p, closed = False, shape = None):
 	''' 
 	Given a curve p, gets the SRVF representation
 	Inputs:
 	- p: An (n x T) matrix representation of the function p: D -> R^n
+	- closed: A boolean indicating whether the passed curve is closed
 	- shape: A vector denoting the size of p, i.e., [n, T]. If none given,
-			 will determine shape of p. Used to speed up batch processing
+			 will determine shape of p
 	Outputs:
 	An (n x T) matrix representation of the SRVF of p
 	'''
@@ -146,10 +147,23 @@ def curve_to_q(p, shape = None):
 	for i in range(T):
 		q[:,i] = beta_dot[:,i]/(np.sqrt(np.linalg.norm(beta_dot[:,i])) + eps)
 
-	# q = project_B(q)
-	q = projectC(q)
+	if not closed:
+		q = project_B(q)
+	else:
+		q = projectC(q)
 
 	return q
+
+def is_curve_closed(curve):
+	'''
+	Determines if the given curve is closed or open
+	Inputs:
+	- curve: An (n x T) matrix representing a curve from [0, 2pi] -> R^n
+	Outputs:
+	A boolean. True if the curve is closed, false otherwise
+	'''
+	n, T = np.shape(curve)
+	return np.sum(curve[:,0] == curve[:,-1]) == n 
 
 def batch_curve_to_q(curves):
 	''' 
@@ -163,7 +177,14 @@ def batch_curve_to_q(curves):
 	'''
 	N, n, T = np.shape(curves)
 
-	return [curve_to_q(p_i, [n, T]) for p_i in curves]
+	# Determine if first curve is closed. All other curves will be labeled accordingly
+	is_closed = is_curve_closed(curves[0])
+	if is_closed:
+		print('Closed curves detected.')
+	else:
+		print('Open curves detected.')
+
+	return [curve_to_q(p_i, is_closed, [n, T]) for p_i in curves], is_closed
 
 def q_to_curve(q):
 	''' 
@@ -314,37 +335,46 @@ def load_gamma(filename):
 
 	return gamma
 
-def group_action_by_gamma(q, gamma):
+def group_action_by_gamma(q, gamma, is_closed):
 	'''
 	Computes composition of q and gamma and normalizes by gradient
 	Inputs:
 	- q: An (n x T) matrix 
 	- gamma: A T-dimensional vector representing the warp to apply to q
+	- is_closed: A boolean indicating whether the original curves are closed
 	Outputs:
 	- qn: An (n x T) matrix representing the composition of q with gamma
 		  normalized by the gradient
 	'''
 	n, T = np.shape(q)
-	gamma_t = np.gradient(gamma, 2*np.pi/(T-1))
 	D = np.linspace(0, 2*np.pi, T, True)
 
-	q_composed_gamma = np.zeros_like(q)
+	if is_closed:
+		gamma_t = np.gradient(gamma, 2*np.pi/(T-1))
 
-	for i in range(n):
-		f = interp1d(D, q[i,:], kind = 'nearest')
-		q_composed_gamma[i,:] = f(gamma)
+		q_composed_gamma = np.zeros_like(q)
+
+		for i in range(n):
+			f = interp1d(D, q[i,:], kind = 'nearest')
+			q_composed_gamma[i,:] = f(gamma)
+
+	else:
+		gamma_t = np.gradient(gamma, 2*np.pi/T)
+		f = interp1d(D, q, kind = 'linear', fill_value = 'extrapolate')
+		q_composed_gamma = f(gamma)
 
 	sqrt_gamma_t = np.tile(np.sqrt(gamma_t), (n, 1))
 	qn = np.multiply(q_composed_gamma, sqrt_gamma_t)
 
 	return qn
 
-def initialize_gamma_using_DP(q1, q2):
+def initialize_gamma_using_DP(q1, q2, is_closed):
 	'''
 	Gets the warping function that warps q2 to q1 and the reparameterization of q2
 	Inputs:
 	- q1: An (n x T) matrix
 	- q2: An (n x T) matrix
+	- is_closed: A boolean indicating whether the original curves are closed
 	Outputs:
 	- q2n: An (n x T) matrix representing the reparameterization of q2 (q2(gamma))
 	- gamma: A T-dimensional vector of the differomorphism that warps q2 to q1
@@ -359,15 +389,42 @@ def initialize_gamma_using_DP(q1, q2):
 
 	gamma = load_gamma('gamma.dat')
 	gamma = 2*np.pi*gamma/np.max(gamma)
-	q2n = group_action_by_gamma(q2, gamma)
+	q2n = group_action_by_gamma(q2, gamma, is_closed)
 
 	return q2n, gamma
 
-def estimate_gamma(q):
+def initialize_gamma_using_DP_symm(q1, q2, is_closed):
+	'''
+	Gets the warping function that warps q2 to q1 and the reparameterization of q2
+	Inputs:
+	- q1: An (n x T) matrix
+	- q2: An (n x T) matrix
+	- is_closed: A boolean indicating whether the original curves are closed
+	Outputs:
+	- q2n: An (n x T) matrix representing the reparameterization of q2 (q2(gamma))
+	- gamma: A T-dimensional vector of the differomorphism that warps q2 to q1
+	'''
+
+	# Create and save q-array
+	qarr = np.array([q1, q2])
+	save_q_shapes('DPshapedata.dat', qarr)
+
+	# Call to get gamma
+	# TODO: Replace DP_Shape_Match_SRVF_nDim with DP_matchSymm when available
+	os.system('./DP_Shape_Match_SRVF_nDim DPshapedata.dat gamma.dat')
+
+	gamma = load_gamma('gamma.dat')
+	gamma = 2*np.pi*gamma/np.max(gamma)
+	q2n = group_action_by_gamma(q2, gamma, is_closed)
+
+	return q2n, gamma
+
+def estimate_gamma(q, is_closed):
 	'''
 	Estimate warping function given curve
 	Inputs:
 	- q: An (n x T) matrix
+	- is_closed: A boolean indicating whether the original curves are closed
 	Outputs:
 	- gamma: A T-dimensional vector representing a diffeomorphism
 	'''
@@ -375,10 +432,20 @@ def estimate_gamma(q):
 	p = q_to_curve(q)
 	n, T = np.shape(p)
 
-	# Evaluate arc-length formula
-	pdiff = np.diff(p, 1)
-	ds = T*np.sqrt(np.sum(np.square(pdiff), axis = 0))
-	ds_cumsum = np.cumsum(ds)
-	gamma = 2*np.pi*ds_cumsum/np.max(ds_cumsum)
+	if is_closed:
+		# Evaluate arc-length formula
+		pdiff = np.diff(p, 1)
+		ds = T*np.sqrt(np.sum(np.square(pdiff), axis = 0))
+		ds_cumsum = np.cumsum(ds)
+		gamma = 2*np.pi*ds_cumsum/np.max(ds_cumsum)
+	else:
+		if n == 1:
+			pgrad = np.gradient(p[0,:], 2*np.pi/T)
+			ds = T*np.abs(pgrad)
+		else:
+			pgrad = np.gradient(p, 2*np.pi/T)
+			ds = T*np.sqrt(np.sum(np.square(pgrad), axis = 0))
+		cum_sum = cumtrapz(ds, dx = 2*np.pi/T, initial = 0)
+		gamma = 2*np.pi*cum_sum/np.max(cum_sum)
 
 	return gamma

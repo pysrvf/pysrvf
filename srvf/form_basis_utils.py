@@ -97,12 +97,13 @@ def gram_schmidt(X):
 
 	return Y
 
-def project_tangent(f, q):
+def project_tangent(f, q, is_closed):
 	''' 
 	Projects tangent vector f 
 	Inputs:
 	- f: An (n x T) matrix representing tangent vector at q
 	- q: An (n x T) matrix 
+	- is_closed: A boolean indicating whether the original curves are closed
 	Outputs:
 	- fnew: Projection of f onto tangent space of C at q
 	'''
@@ -110,6 +111,9 @@ def project_tangent(f, q):
 
 	# Project w in T_q(C(B))
 	w = f - inner_product_L2(f, q)*q
+
+	if not is_closed:
+		return w
 
 	# Get basis for normal space of C(A)
 	g = form_basis_normal_A(q)

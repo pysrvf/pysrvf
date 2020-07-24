@@ -379,7 +379,7 @@ def geodesic_distance_all(qarr, computation_type, is_closed):
 				E_geo_C_arr.append(E_geo_C)
 				gamma_arr.append(gamma)
 				geo_dist_arr.append(geo_dist)
-				print('{}--{}, {}'.format(i+1, j+1, geo_dist))
+				# print('{}--{}, {}'.format(i+1, j+1, geo_dist))
 	elif computation_type == 'pairwise':
 		# Check if array has even number of elements
 		if num_shapes%2 == 0:

@@ -163,6 +163,9 @@ def is_curve_closed(curve):
 	A boolean. True if the curve is closed, false otherwise
 	'''
 	n, T = np.shape(curve)
+	if n == 1:
+		return False
+		
 	return np.sum(curve[:,0] == curve[:,-1]) == n 
 
 def batch_curve_to_q(curves):
@@ -180,9 +183,9 @@ def batch_curve_to_q(curves):
 	# Determine if first curve is closed. All other curves will be labeled accordingly
 	is_closed = is_curve_closed(curves[0])
 	if is_closed:
-		print('Closed curves detected.')
+		print('Closed curves detected. {} total curves.'.format(N))
 	else:
-		print('Open curves detected.')
+		print('Open curves detected. {} total curves.'.format(N))
 
 	return [curve_to_q(p_i, is_closed, [n, T]) for p_i in curves], is_closed
 

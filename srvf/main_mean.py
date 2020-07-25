@@ -25,6 +25,7 @@ def get_data_mean(Xdata, subject_first = True):
 		Xdata = [np.reshape(c, (1, T)) for c in Xdata]
 	elif len(Xdata_shape) == 3:
 		if not subject_first:
+			n, T, N = np.shape(Xdata)
 			Xdata = [Xdata[:,:,i] for i in range(N)]
 	else:
 		print('Error: Xdata needs to be of size (N x T), (N x n x T), or (n x T x N).')

@@ -166,7 +166,7 @@ def is_curve_closed(curve):
 	if n == 1:
 		return False
 		
-	return np.sum(curve[:,0] == curve[:,-1]) == n 
+	return np.sum(np.abs(curve[:,0] - curve[:,-1])) <= 1e-15
 
 def batch_curve_to_q(curves):
 	''' 

@@ -1,6 +1,6 @@
 import numpy as np 
-from generic_utils import *
-from find_mean_shape import get_mean
+from pysrvf.generic_utils import *
+from pysrvf.find_mean_shape import get_mean
 
 def get_data_mean(Xdata, subject_first = True):
 	''' 

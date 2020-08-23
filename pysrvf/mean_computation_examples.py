@@ -1,5 +1,5 @@
 import numpy as np 
-from main_mean import get_data_mean
+from pysrvf.main_mean import get_data_mean
 
 ### ----- 1d examples ----- ###
 # Bumps

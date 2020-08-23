@@ -1,6 +1,6 @@
 import numpy as np
 import warnings
-from generic_utils import *
+from pysrvf.generic_utils import *
 
 
 def form_basis_D(d, T):

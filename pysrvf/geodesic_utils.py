@@ -1,6 +1,6 @@
 import numpy as np
-from generic_utils import *
-from form_basis_utils import *
+from pysrvf.generic_utils import *
+from pysrvf.form_basis_utils import *
 
 def geodesic_Q(q1, q2, stp):
 	'''

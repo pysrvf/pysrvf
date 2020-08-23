@@ -1,7 +1,7 @@
 import numpy as np 
 from scipy.integrate import cumtrapz
-from generic_utils import inner_product_L2
-from generic_utils import induced_norm_L2
+from pysrvf.generic_utils import inner_product_L2
+from pysrvf.generic_utils import induced_norm_L2
 
 
 def project_B(q, D = None):

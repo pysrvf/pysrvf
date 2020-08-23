@@ -1,8 +1,8 @@
 import numpy as np 
-from generic_utils import *
-from geodesic_utils import *
-from form_basis_utils import *
-from compute_geodesic import *
+from pysrvf.generic_utils import *
+from pysrvf.geodesic_utils import *
+from pysrvf.form_basis_utils import *
+from pysrvf.compute_geodesic import *
 # from tqdm import tqdm
 from tqdm import trange
 

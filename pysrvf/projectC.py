@@ -1,7 +1,7 @@
 import numpy as np
 import warnings
-from generic_utils import *
-from form_basis_utils import form_basis_normal_A
+from pysrvf.generic_utils import *
+from pysrvf.form_basis_utils import form_basis_normal_A
 
 def projectC(q):
     ''' 

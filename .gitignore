@@ -1,0 +1,11 @@
+*.py[cod]
+
+# C extensions
+*.so
+
+# Packages
+dist
+build
+
+# Pycharm Project
+.idea

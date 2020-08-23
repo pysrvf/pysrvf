@@ -1,4 +1,4 @@
-import numpy as np 
+import numpy as np
 from pysrvf.main_mean import get_data_mean
 
 ### ----- 1d examples ----- ###
@@ -36,7 +36,7 @@ elif n == 2:
 	plt.plot(pmean_scaled[0,:], pmean_scaled[1,:], 'k--')
 elif n == 3:
 	from mpl_toolkits.mplot3d import Axes3D
-	fig = plt.figure()	
+	fig = plt.figure()
 	ax = fig.add_subplot(111, projection='3d')
 	for c in reformatted_Xdata:
 		ax.plot(c[0,:], c[1,:], c[2,:], alpha = 0.4)

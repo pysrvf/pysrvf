@@ -1,6 +1,6 @@
 import numpy as np
 from pysrvf.main_mean import get_data_mean
-
+import time
 ### ----- 1d examples ----- ###
 # Bumps
 # Shape is (N x T)
@@ -16,8 +16,10 @@ from pysrvf.main_mean import get_data_mean
 # 2d parametric curves
 # Shape is (n x T x N)
 Xdata = np.load('../Data/2d/misc.npy')
+t = time.time()
+# do stuff
 qmean, pmean, pmean_scaled, reformatted_Xdata = get_data_mean(Xdata, subject_first = False)
-
+print(time.time() - t)
 ### ----- 3d examples ----- ###
 # Xdata = np.load('../Data/3d/sine_curves.npy')
 # qmean, pmean, pmean_scaled, reformatted_Xdata = get_data_mean(Xdata)

@@ -381,7 +381,7 @@ def initialize_gamma_using_DP(q1, q2, is_closed):
 	- is_closed: A boolean indicating whether the original curves are closed
 	Outputs:
 	- q2n: An (n x T) matrix representing the reparameterization of q2 (q2(gamma))
-	- gamma: A T-dimensional vector of the differomorphism that warps q2 to q1
+	- gamma: A T-dimensional vector of the diffeomorphism that warps q2 to q1
 	'''
 
 	# Create and save q-array

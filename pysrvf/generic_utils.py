@@ -4,6 +4,7 @@ import os
 import warnings
 from scipy.interpolate import interp1d
 from scipy.integrate import cumtrapz
+from dpmatchsrvf import dpmatch
 
 def inner_product_L2(u, v):
 	'''
@@ -385,13 +386,15 @@ def initialize_gamma_using_DP(q1, q2, is_closed):
 	'''
 
 	# Create and save q-array
-	qarr = np.array([q1, q2])
-	save_q_shapes('DPshapedata.dat', qarr)
+	# qarr = np.array([q1, q2])
+	# save_q_shapes('DPshapedata.dat', qarr)
 
 	# Call to get gamma
-	os.system('./DP_Shape_Match_SRVF_nDim DPshapedata.dat gamma.dat')
+	# os.system('./DP_Shape_Match_SRVF_nDim DPshapedata.dat gamma.dat')
 
-	gamma = load_gamma('gamma.dat')
+	gamma = dpmatch().match(q1, q2)
+
+	# gamma = load_gamma('gamma.dat')
 	gamma = 2*np.pi*gamma/np.max(gamma)
 	q2n = group_action_by_gamma(q2, gamma, is_closed)
 

@@ -2,6 +2,8 @@ import numpy as np
 from scipy.integrate import cumtrapz
 from pysrvf.generic_utils import inner_product_L2
 from pysrvf.generic_utils import induced_norm_L2
+from pysrvf.generic_utils import group_action_by_gamma
+from dpmatchsrvf import dpmatch
 
 
 def project_B(q, D = None):
@@ -162,3 +164,17 @@ def inverse_exponential_map(u, v, D = None):
 	# return theta/(np.sin(theta) + eps)*(v - uv_inner_prod*u)
 
 	return np.arccos(uv_inner_prod)/np.sqrt(1 - uv_inner_prod**2)*(v - uv_inner_prod*u)
+
+def match(f1, f2, is_closed=False, qfunc=True):
+
+	if (qfunc):
+		q1 = f1
+		q2 = f2
+	else:
+		q1 = curve_to_q(f1)
+		q2 = curve_to_q(f2)
+
+	gamma = dpmatch().match(q1, q2)
+	f2n = group_action_by_gamma(q2, gamma, is_closed)
+
+	return f2n, gamma

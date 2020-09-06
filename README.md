@@ -3,7 +3,7 @@
 Install `dpmatchsrvf` from https://github.com/pysrvf/dpmatchsrvf   
 
 
-### Install as a package
+### Install `pysrvf` as a package
 
 ```bash
 git clone https://github.com/pysrvf/pysrvf.git

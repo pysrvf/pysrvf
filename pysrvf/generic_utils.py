@@ -210,6 +210,25 @@ def q_to_curve(q):
 
 	return p
 
+def reparameterize_curve_gamma(curve, gamma):
+	'''
+	Applies the warping function gamma to the given curve
+	Inputs:
+	- curve: An (n x T) matrix representing the curve
+	- gamma: A T-dimensional vector representing the warping function
+	Outputs:
+	- An (n x T) matrix representation of the warped curve
+	'''
+
+	n, T = np.shape(curve)
+	pn = np.zeros_like(curve)
+
+	for i in range(n):
+		f = interp1d(np.linspace(0, 2*np.pi, T), curve[i,:], kind = 'linear')
+		pn[i,:] = f(gamma)
+
+	return pn
+
 def find_best_rotation(q1, q2):
 	'''
 	Solves Procrusted problem to find optimal rotation
@@ -364,7 +383,7 @@ def group_action_by_gamma(q, gamma, is_closed):
 			q_composed_gamma[i,:] = f(gamma)
 
 	else:
-		gamma_t = np.gradient(gamma, 2*np.pi/T)
+		gamma_t = np.gradient(gamma, 2*np.pi/T) # CHECK THIS
 		f = interp1d(D, q, kind = 'linear', fill_value = 'extrapolate')
 		q_composed_gamma = f(gamma)
 
@@ -391,6 +410,7 @@ def initialize_gamma_using_DP(q1, q2, is_closed):
 
 	# Call to get gamma
 	# os.system('./DP_Shape_Match_SRVF_nDim DPshapedata.dat gamma.dat')
+	# os.system('./DPShapeMatch DPshapedata.dat gamma.dat')
 
 	gamma = dpmatch().match(q1, q2)
 

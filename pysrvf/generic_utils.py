@@ -210,6 +210,32 @@ def q_to_curve(q):
 
 	return p
 
+
+def batch_q_to_curve(srvfs):
+	''' 
+	Given a collection of SRVF, gets their original representation. Assumes that all
+	matrix representations of the curves are of the same size. 
+	Inputs:
+	- srvfs: A (N x n x T) list of matrices.
+	Outputs:
+	A (N x n x T) list of matrices where the ith element is the original representation
+	of the ith srvf in srvfs.
+	'''
+	N, n, T = np.shape(srvfs)
+
+	# Determine if first curve is closed. All other curves will be labeled accordingly
+	is_closed = is_curve_closed(srvfs[0])
+	if is_closed:
+		print('Closed srvfs detected. {} total curves.'.format(N))
+	else:
+		print('Open srvfs detected. {} total curves.'.format(N))
+
+        #Make sure to add additional parameters to match curve_to_q
+	return [q_to_curve(q_i) for q_i in srvfs], is_closed
+
+          
+
+
 def reparameterize_curve_gamma(curve, gamma):
 	'''
 	Applies the warping function gamma to the given curve

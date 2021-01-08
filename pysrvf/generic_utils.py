@@ -406,7 +406,7 @@ def group_action_by_gamma(q, gamma, is_closed):
 			q_composed_gamma[i,:] = f(gamma)
 
 	else:
-		gamma_t = np.gradient(gamma, 2*np.pi/T) # CHECK THIS
+		gamma_t = np.gradient(gamma, 2*np.pi/(T-1)) 
 		f = interp1d(D, q, kind = 'linear', fill_value = 'extrapolate')
 		q_composed_gamma = f(gamma)
 

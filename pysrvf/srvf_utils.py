@@ -169,7 +169,7 @@ from dpmatchsrvf import dpmatch
 
 def match(f1, f2, is_closed=False, qfunc=True):
 
-	if (qfunc):
+	if qfunc:
 		q1 = f1
 		q2 = f2
 	else:
@@ -177,6 +177,7 @@ def match(f1, f2, is_closed=False, qfunc=True):
 		q2 = curve_to_q(f2)
 
 	gamma = dpmatch().match(q1, q2)
+	gamma = 2*np.pi*gamma/np.max(gamma)
 	f2n = group_action_by_gamma(q2, gamma, is_closed)
 
 	return f2n, gamma
@@ -196,13 +197,14 @@ def fisher_rao(f1, f2, is_closed = False, q_space = True):
 	else:
 		q1 = curve_to_q(f1)
 		q2 = curve_to_q(f2)
-	q2n, gamma = match(q1, q2, is_closed, q_space)
-	gamma_dot = np.gradient(gamma)
+
+	q2n, gamma = match(q1, q2, is_closed, qfunc = True)
+	gamma_dot = np.gradient(gamma, (2*np.pi)/(len(gamma)-1))
 	gamma_dot_sqrt = np.sqrt(gamma_dot)
 	q2n_tilde = np.zeros_like(q2n)
 
 	n, _ = np.shape(q2n)
 	for i in range(n):
-		q2n_tilde[i,:] = np.dot(gamma_dot_sqrt, q2n[i,:])
+		q2n_tilde[i,:] = np.multiply(gamma_dot_sqrt, q2n[i,:])
 	
 	return induced_norm_L2(q1 - q2n_tilde)

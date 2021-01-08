@@ -207,4 +207,4 @@ def fisher_rao(f1, f2, is_closed = False, q_space = True):
 	for i in range(n):
 		q2n_tilde[i,:] = np.multiply(gamma_dot_sqrt, q2n[i,:])
 	
-	return induced_norm_L2(q1 - q2n_tilde)
+	return induced_norm_L2(q1 - q2n_tilde), gamma

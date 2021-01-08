@@ -210,7 +210,6 @@ def q_to_curve(q):
 
 	return p
 
-
 def batch_q_to_curve(srvfs):
 	''' 
 	Given a collection of SRVF, gets their original representation. Assumes that all
@@ -232,10 +231,7 @@ def batch_q_to_curve(srvfs):
 
         #Make sure to add additional parameters to match curve_to_q
 	return [q_to_curve(q_i) for q_i in srvfs], is_closed
-
-          
-
-
+	
 def reparameterize_curve_gamma(curve, gamma):
 	'''
 	Applies the warping function gamma to the given curve
@@ -268,6 +264,7 @@ def find_best_rotation(q1, q2):
 	n, T = np.shape(q1)
 	A = np.matmul(q1, q2.T)
 	[U, S, V] = np.linalg.svd(A)
+	V = V.T
 
 	S = np.eye(n)
 	if (np.abs(np.linalg.det(U)*np.linalg.det(V) - 1) > 10*np.spacing(1)):

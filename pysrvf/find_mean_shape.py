@@ -33,6 +33,7 @@ def get_mean(qarr, is_closed, num_itr):
 
 	# Initialize mean to extrinsic average
 	qmean = np.mean(qarr, axis = 0)
+
 	if is_closed:
 		qmean = projectC(qmean)
 	else:

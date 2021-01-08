@@ -170,7 +170,7 @@ def compute_geodesic_C_factor_D_open(q1, q2, stp, d, dt):
 
 	q1 = project_B(q1)
 	q2n = project_B(q2)
-	q2n, _ = initialize_gamma_using_DP(q1, q2, False)
+	q2n, gamma = initialize_gamma_using_DP(q1, q2n, False)
 	q2n = project_B(q2n)
 	alpha, alpha_T, E, L = compute_geodesic_B(q1, q2n, stp)
 
@@ -217,7 +217,6 @@ def compute_geodesic_C_factor_D_open(q1, q2, stp, d, dt):
 			diffL = np.linalg.norm(L_iter[itr-1] - L_iter[itr-2])
 	gamma = estimate_gamma(q2n, False)
 	geo_dist = L
-
 	return alpha, alpha_t, A_norm_iter, E_geo_C, gamma, geo_dist
 
 def compute_geodesic_C_factor_D_symm(q1, q2, stp, d, dt):
@@ -349,7 +348,7 @@ def compute_elastic_geodesic(q1, q2, stp, d, dt, data_reg_flag, sym_flag, is_clo
 def geodesic_distance_all(qarr, computation_type, is_closed):
 	'''
 	'''
-	stp = 6
+	stp = 7
 	dt = 0.1
 	d = 5
 
@@ -371,8 +370,9 @@ def geodesic_distance_all(qarr, computation_type, is_closed):
 					alpha, alpha_t, A_norm_iter, E_geo_C, gamma, geo_dist = \
 						compute_elastic_geodesic(q1, q2, stp, d, dt, 'nonreg', '', is_closed)
 				else:
+					# Check if 'nonreg' flag is appropriate
 					alpha, alpha_t, A_norm_iter, E_geo_C, gamma, geo_dist = \
-						compute_elastic_geodesic(q1, q2, stp, d, dt, 'reg', 'symt', is_closed)
+						compute_elastic_geodesic(q1, q2, stp, d, dt, 'nonreg', 'symt', is_closed)
 				alpha_arr.append(alpha)
 				alpha_t_arr.append(alpha_t)
 				A_norm_iter_arr.append(A_norm_iter)
@@ -391,7 +391,7 @@ def geodesic_distance_all(qarr, computation_type, is_closed):
 						compute_elastic_geodesic(q1, q2, stp, d, dt, 'nonreg', '', is_closed)
 				else:
 					alpha, alpha_t, A_norm_iter, E_geo_C, gamma, geo_dist = \
-						compute_elastic_geodesic(q1, q2, stp, d, dt, 'reg', 'sym', is_closed)
+						compute_elastic_geodesic(q1, q2, stp, d, dt, 'nonreg', 'sym', is_closed)
 				alpha_arr.append(alpha)
 				alpha_t_arr.append(alpha_t)
 				A_norm_iter_arr.append(A_norm_iter)

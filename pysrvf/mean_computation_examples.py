@@ -1,28 +1,31 @@
 import numpy as np
 from pysrvf.main_mean import get_data_mean
 import time
+# from scipy.io import savemat
+
 ### ----- 1d examples ----- ###
 # Bumps
 # Shape is (N x T)
-# Xdata = np.load('../Data/1d/two_bumps.npy')
-# qmean, pmean, pmean_scaled, reformatted_Xdata = get_data_mean(Xdata)
+# Xdata = np.load('../data/1d/two_bumps.npy')
+# qmean, pmean, pmean_scaled, reformatted_Xdatam _ = get_data_mean(Xdata)
 
 ### ----- 2d examples ----- ###
 # Dog curves
 # Shape is (N x n x T)
-# Xdata = np.load('../Data/2d/dog_curves.npy')
-# qmean, pmean, pmean_scaled, reformatted_Xdata = get_data_mean(Xdata)
+Xdata = np.load('../data/2d/dog_curves.npy')
+qmean, pmean, pmean_scaled, reformatted_Xdata, _ = get_data_mean(Xdata)
 
 # 2d parametric curves
 # Shape is (n x T x N)
-Xdata = np.load('../Data/2d/misc.npy')
-t = time.time()
-# do stuff
-qmean, pmean, pmean_scaled, reformatted_Xdata = get_data_mean(Xdata, subject_first = False)
-print(time.time() - t)
+# Xdata = np.load('../data/2d/misc.npy')
+# t = time.time()
+# # do stuff
+# qmean, pmean, pmean_scaled, reformatted_Xdata, _ = get_data_mean(Xdata, subject_first = False)
+# print(time.time() - t)
+
 ### ----- 3d examples ----- ###
-# Xdata = np.load('../Data/3d/sine_curves.npy')
-# qmean, pmean, pmean_scaled, reformatted_Xdata = get_data_mean(Xdata)
+# Xdata = np.load('../data/3d/sine_curves.npy')
+# qmean, pmean, pmean_scaled, reformatted_Xdata, _ = get_data_mean(Xdata)
 
 ### Plot data and mean ###
 import matplotlib.pyplot as plt 

@@ -125,4 +125,61 @@ def project_tangent(f, q, is_closed):
 	fnew = w - s
 
 	return fnew
-	
+
+
+def form_basis_L2_R3(d, T):
+
+	x = np.linspace(0, 2 * np.pi, T, True)
+	k = 0
+	sqrt_2 = np.sqrt(2);
+	constB = np.zeros((3, 3, T))
+
+	constB[0] = np.array([np.sqrt(2) * np.ones(T), np.zeros(T), np.zeros(T)])
+	constB[1] = np.array([np.zeros(T), np.sqrt(2) * np.ones(T), np.zeros(T)])
+	constB[2] = np.array([np.zeros(T), np.zeros(T), np.sqrt(2) * np.ones(T)])
+
+	B = np.zeros( (6*d, 3, T))
+	for j in np.arange(1, d+1):
+		B[0 + 6*k] = np.array([np.sqrt(2) * np.cos(2 * np.pi * j * x), np.zeros(T), np.zeros(T)])
+		B[1 + 6*k] = np.array([np.zeros(T), np.sqrt(2) * np.cos(2 * np.pi * j * x), np.zeros(T)])
+		B[2 + 6*k] = np.array([np.zeros(T), np.zeros(T), np.sqrt(2) * np.cos(2 * np.pi * j * x)])
+		B[3 + 6*k] = np.array([np.sqrt(2) * np.sin(2 * np.pi * j * x), np.zeros(T), np.zeros(T)])
+		B[4 + 6*k] = np.array([np.zeros(T), np.sqrt(2) * np.sin(2 * np.pi * j * x), np.zeros(T)])
+		B[5 + 6*k] = np.array([np.zeros(T), np.zeros(T), np.sqrt(2) * np.sin(2 * np.pi * j * x)])
+		k = k + 1
+
+	B = np.concatenate((constB, B))
+
+	return B
+
+def form_basis_of_tangent_space_of_S_at_q(Bnew, G_O_q):
+
+	# T_q(S) = T_q(C) + T_q(O_q)^{\perp}
+	# Subtract the projection of basis of T_q(C) onto T_q(O_q) from itself
+	# i.e. basis(T_q(C)) - <basis(T_q(C)), basis(T_q(O_q))> * basis(T_q(O_q))
+
+	Gnew = Bnew.copy()
+	for jj in np.arange(0, np.shape(Bnew)[0]):
+		tmp = 0
+		for kk in np.arange(0, np.shape(G_O_q)[0]):
+			tmp = tmp + inner_product_L2(Bnew[jj], G_O_q[kk])*G_O_q[kk];
+		# tmp calculates projections of vectors in T_q(C) onto T_q(O_q)
+		# by iteratively summing up over the projections along the
+		# orthonormal basis of T_q(O_q)
+		Gnew[jj] = Bnew[jj] - tmp
+
+	return Gnew
+
+
+def project_to_basis(alpha_t_array, Y):
+
+	V = np.zeros(Y.shape)
+	A = np.zeros((alpha_t_array.shape[0], Y.shape[0]))
+	n, T = np.shape(Y[0])
+	for ii in np.arange(0, alpha_t_array.shape[0]):
+		V[ii] = np.zeros((n, T))
+		for jj in np.arange(0, Y.shape[0]):
+			A[ii, jj] = inner_product_L2(alpha_t_array[ii], Y[jj])
+			V[ii] = V[ii] + A[ii, jj] * Y[jj]
+
+	return A, V

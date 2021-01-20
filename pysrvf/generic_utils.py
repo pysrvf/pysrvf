@@ -499,3 +499,11 @@ def estimate_gamma(q, is_closed):
 		gamma = 2*np.pi*cum_sum/np.max(cum_sum)
 
 	return gamma
+
+
+def project_to_tangent_C_q(B, q):
+
+	Bnew = B.copy()
+	for jj in np.arange(0, np.shape(B)[0]):
+		Bnew[jj] = B[jj] - inner_product_L2(B[jj], q)*q
+	return Bnew

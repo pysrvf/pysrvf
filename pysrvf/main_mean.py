@@ -2,9 +2,11 @@
 # from pysrvf.generic_utils import *
 # from pysrvf.find_mean_shape import get_mean
 
-import numpy as np 
-from generic_utils import *
-from find_mean_shape import get_mean
+import numpy as np
+from pysrvf.generic_utils import *
+# from generic_utils import *
+from pysrvf.find_mean_shape import get_mean
+# from find_mean_shape import get_mean
 
 def get_data_mean(Xdata, subject_first = True):
 	''' 
@@ -65,4 +67,4 @@ def get_data_mean(Xdata, subject_first = True):
 	else:
 		pmean_scaled = pmean
 
-	return qmean, pmean, pmean_scaled, Xdata, qarr
+	return qmean, pmean, pmean_scaled, Xdata, qarr, alpha_t_arr

@@ -7,6 +7,7 @@ from pysrvf.generic_utils import *
 # from generic_utils import *
 from pysrvf.find_mean_shape import get_mean
 # from find_mean_shape import get_mean
+from scipy.signal import savgol_filter
 
 def get_data_mean(Xdata, subject_first = True):
 	''' 
@@ -68,3 +69,17 @@ def get_data_mean(Xdata, subject_first = True):
 		pmean_scaled = pmean
 
 	return qmean, pmean, pmean_scaled, Xdata, qarr, alpha_t_arr
+
+
+def get_deformation_field_from_tangent_vectors(alpha_t_arr):
+
+	K = len(alpha_t_arr)
+	_, n, T = np.shape(alpha_t_arr[0])
+	alpha_t_mean = np.zeros((n,T))
+	for ii in range(K):
+		temp = alpha_t_arr[ii]
+		alpha_t_mean += temp[1]
+	alpha_t_mean /= K
+	alpha_t_mag = np.sum(alpha_t_mean**2,axis=0)**(1./2)
+	alpha_t_mag = savgol_filter(alpha_t_mag, 9, 2)
+	return alpha_t_mag

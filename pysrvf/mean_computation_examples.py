@@ -13,7 +13,7 @@ import time
 # Dog curves
 # Shape is (N x n x T)
 Xdata = np.load('../data/2d/dog_curves.npy')
-qmean, pmean, pmean_scaled, reformatted_Xdata, _ = get_data_mean(Xdata)
+qmean, pmean, pmean_scaled, reformatted_Xdata, qarr, alpha_t_arr = get_data_mean(Xdata)
 
 # 2d parametric curves
 # Shape is (n x T x N)

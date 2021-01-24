@@ -507,3 +507,11 @@ def project_to_tangent_C_q(B, q):
 	for jj in np.arange(0, np.shape(B)[0]):
 		Bnew[jj] = B[jj] - inner_product_L2(B[jj], q)*q
 	return Bnew
+
+
+def get_deformation_field_from_mean(qmean, alpha_t_array):
+
+	k, n, T = np.shape(alpha_t_array)
+	K = len(alpha_t_array)
+
+

@@ -4,6 +4,8 @@ from pysrvf.generic_utils import *
 from pysrvf.geodesic_utils import *
 from pysrvf.form_basis_utils import *
 from scipy.integrate import trapz
+from tqdm import trange
+
 
 def compute_geodesic_C(q0, q1, stp, dt):
 	'''
@@ -362,7 +364,8 @@ def geodesic_distance_all(qarr, computation_type, is_closed):
 	geo_dist_arr = []
 
 	if computation_type == 'all':
-		for i in range(num_shapes):
+		for i in trange(num_shapes, desc='Compute Geodesics ', leave=False):  # range(N):
+		# for i in range(num_shapes):
 			q1 = qarr[i]
 			for j in np.arange(i+1, num_shapes):
 				q2 = qarr[j]
@@ -391,14 +394,14 @@ def geodesic_distance_all(qarr, computation_type, is_closed):
 						compute_elastic_geodesic(q1, q2, stp, d, dt, 'nonreg', '', is_closed)
 				else:
 					alpha, alpha_t, A_norm_iter, E_geo_C, gamma, geo_dist = \
-						compute_elastic_geodesic(q1, q2, stp, d, dt, 'nonreg', 'sym', is_closed)
+						compute_elastic_geodesic(q1, q2, stp, d, dt, 'nonreg', 'symt', is_closed)
 				alpha_arr.append(alpha)
 				alpha_t_arr.append(alpha_t)
 				A_norm_iter_arr.append(A_norm_iter)
 				E_geo_C_arr.append(E_geo_C)
 				gamma_arr.append(gamma)
 				geo_dist_arr.append(geo_dist)
-				print('{}--{}, {}'.format(i+1, i+2, geo_dist))
+				# print('{}--{}, {}'.format(i+1, i+2, geo_dist))
 		else:
 			print('For the selected option: {},'.format(computation_type) + \
 				' qarr should contain an even number of elements.')

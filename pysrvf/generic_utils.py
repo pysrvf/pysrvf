@@ -55,63 +55,65 @@ def form_basis_normal_A(q):
 	return del_g
 
 def projectC(q):
-    ''' 
-    Projects the given SRVF curve onto the space of closed curves
-    Inputs:
-    - q: An (n x T) matrix representing the SRVF representation of a curve
-    Outputs:
-    - qnew: An (n x T) matrix representing the SRVF of a closed curve
-    '''
-    n, T = np.shape(q)
-    dt = 0.3
-    epsilon = (1.0/60.0)*(2.0*np.pi/T)
+  ''' 
+  Projects the given SRVF curve onto the space of closed curves
+  Inputs:
+  - q: An (n x T) matrix representing the SRVF representation of a curve
+  Outputs:
+  - qnew: An (n x T) matrix representing the SRVF of a closed curve
+  '''
+  n, T = np.shape(q)
+  dt = 0.3
+  epsilon = (1.0/60.0)*(2.0*np.pi/T)
 
-    k = 0
-    res = np.ones((1,n))
-    J = np.zeros((n, n))
-    
-    eps = np.spacing(1)
-    qnew = q/(induced_norm_L2(q) + eps)
+  k = 0
+  res = np.ones((1,n))
+  J = np.zeros((n, n))
+  
+  eps = np.spacing(1)
+  qnew = q/(induced_norm_L2(q) + eps)
 
-    while(np.linalg.norm(res, 2) > epsilon):
-        if k > 300:
-            warnings.warn('Shape failed to project. Geodesics will be incorrect.')
-            break
+  while(np.linalg.norm(res, 2) > epsilon):
+      if k > 300:
+          warnings.warn('Shape failed to project. Geodesics will be incorrect.')
+          break
 
-        # Compute Jacobian
-        for i in range(n):
-            for j in range(n):
-                J[i, j] = 3*np.trapz(np.multiply(qnew[i, :], qnew[j, :]), dx = 2*np.pi/(T-1))
-        J += np.eye(n)
+      # Compute Jacobian
+      for i in range(n):
+          for j in range(n):
+              J[i, j] = 3*np.trapz(np.multiply(qnew[i, :], qnew[j, :]), dx = 2*np.pi/(T-1))
+      J += np.eye(n)
 
-        qnorm = np.linalg.norm(qnew, 2, axis = 0)
+      qnorm = np.linalg.norm(qnew, 2, axis = 0)
 
-        # Compute residue
-        res = [-np.trapz(np.multiply(qnew[i,:], qnorm), dx = 2*np.pi/(T-1)) for i in range(n)]
+      # Compute residue
+      res = [-np.trapz(np.multiply(qnew[i,:], qnorm), dx = 2*np.pi/(T-1)) for i in range(n)]
 
-        if np.linalg.norm(res, 2) < epsilon:
-            break
+      if np.linalg.norm(res, 2) < epsilon:
+          break
 
-        J_cond = np.linalg.cond(J)
+      J_cond = np.linalg.cond(J)
 
-        if np.isnan(J_cond) or np.isinf(J_cond) or (J_cond < 0.1):
-            warnings.warn('Projection may not be accurate.')
-            return q/(induced_norm_L2(q) + eps)
-        else:
-            x = np.linalg.solve(J, res)
-            del_G = form_basis_normal_A(qnew)
-            temp = 0
-            for i in range(n):
-                temp += x[i]*del_G[i]*dt
-            qnew += temp
-            k += 1
+      if np.isnan(J_cond) or np.isinf(J_cond) or (J_cond < 0.1):
+          warnings.warn('Projection may not be accurate.')
+          return q/(induced_norm_L2(q) + eps)
+      else:
+          x = np.linalg.solve(J, res)
+          del_G = form_basis_normal_A(qnew)
+          temp = 0
+          for i in range(n):
+              temp += x[i]*del_G[i]*dt
+          qnew += temp
+          k += 1
 
-    qnew = qnew/induced_norm_L2(qnew)
-    
-    return qnew
+  induced_norm = induced_norm_L2(qnew)
+
+  qnew = qnew/induced_norm
+
+  return qnew
 
 def project_B(q):
-	'''
+  '''
 	Projects given point in L2 onto unit Hilbert sphere in L2
 	Inputs: 
 	- q: An (n x T) matrix representation of the SRVF of function p: D -> R^n
@@ -120,9 +122,9 @@ def project_B(q):
 	Outputs:
 	An (n x T) matrix representation of q projected on the Hilbert sphere
 	'''
-	
-	return q/induced_norm_L2(q) 
-	
+  induced_norm = induced_norm_L2(q)
+  return q/induced_norm
+
 def curve_to_q(p, closed = False, shape = None):
 	''' 
 	Given a curve p, gets the SRVF representation
@@ -229,7 +231,7 @@ def batch_q_to_curve(srvfs):
 	else:
 		print('Open srvfs detected. {} total curves.'.format(N))
 
-        #Make sure to add additional parameters to match curve_to_q
+        #Make sure to add additional parameters to match curve_to_q ???
 	return [q_to_curve(q_i) for q_i in srvfs], is_closed
 	
 def reparameterize_curve_gamma(curve, gamma):

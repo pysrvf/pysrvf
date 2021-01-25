@@ -4,7 +4,7 @@ from pysrvf.generic_utils import *
 
 
 def form_basis_D(d, T):
-	''' 
+  ''' 
 	Returns the basis for the tangent space of diffeomorphisms
 	Inputs:
 	- d: A nonnegative integer (number of Fourier coefficients divided by 2)
@@ -12,20 +12,23 @@ def form_basis_D(d, T):
 	Ouputs:
 	- V: A (2d x T) matrix representing the basis
 	'''
-	x = np.reshape(np.linspace(0, 2*np.pi, T, True), (1, T))
-	vec = np.reshape(np.arange(1, d+1), (1, d))
-	x_d_arr = np.matmul(vec.T, x)
-	V = np.vstack([np.cos(x_d_arr)/np.sqrt(np.pi), np.sin(x_d_arr)/np.sqrt(np.pi)])
-	return V
+  x = np.linspace(0, 2*np.pi, T)
+  xdarray = np.arange(1,d+1) 
+  xdarray = np.outer(xdarray,x)
+  V_cos = np.cos(xdarray) / np.sqrt(np.pi)
+  V_sin = np.sin(xdarray) / np.sqrt(np.pi)
+  V = np.concatenate((V_cos,V_sin))
+  x = np.reshape(np.linspace(0, 2*np.pi, T, True), (1, T))
+  return V
 
 def form_basis_D_q(V, q):
 	''' 
 	Returns ... 
 	Inputs:
-	- V: A (d x T) matrix representing basis for tangent space of diffeomorphisms
+	- V: A ((2*d) x T) matrix representing basis for tangent space of diffeomorphisms
 	- q: An (n x T) matrix representation of the SRVF q: [0,2pi] -> R^n
 	Ouputs:
-	- D_q: A (d x n x T) array
+	- D_q: A ((2*d) x n x T) array
 	'''
 	d, _ = np.shape(V)
 	n, T = np.shape(q)
@@ -47,10 +50,10 @@ def project_tgt_D_q(u, D_q):
 	Returns ... 
 	Inputs:
 	- u: An (n x T) matrix
-	- D_q: A (d x n x T) array
+	- D_q: A ((2*d) x n x T) array
 	Ouputs:
 	- u_proj: An (n x T) matrix of projection of u 
-	- a: A d-dimensional vector representing Fourier coefficients
+	- a: A (1 x (2*d)) vector representing Fourier coefficients
 	'''
 	d, n, T = np.shape(D_q)
 
@@ -128,33 +131,47 @@ def project_tangent(f, q, is_closed):
 
 
 def form_basis_L2_R3(d, T):
+  '''
+  Returns Schauder basis for L_2(R^3)
+  Note basis elements will be 6 x d
+  '''
 
-	x = np.linspace(0, 2 * np.pi, T, True)
-	k = 0
-	sqrt_2 = np.sqrt(2);
-	constB = np.zeros((3, 3, T))
+  x = np.linspace(0, 2 * np.pi, T, True)
+  sqrt_2 = np.sqrt(2)
+  constB = np.zeros((3, 3, T))
 
-	constB[0] = np.array([np.sqrt(2) * np.ones(T), np.zeros(T), np.zeros(T)])
-	constB[1] = np.array([np.zeros(T), np.sqrt(2) * np.ones(T), np.zeros(T)])
-	constB[2] = np.array([np.zeros(T), np.zeros(T), np.sqrt(2) * np.ones(T)])
+  constB[0] = np.array([np.sqrt(2) * np.ones(T), np.zeros(T), np.zeros(T)])
+  constB[1] = np.array([np.zeros(T), np.sqrt(2) * np.ones(T), np.zeros(T)])
+  constB[2] = np.array([np.zeros(T), np.zeros(T), np.sqrt(2) * np.ones(T)])
 
-	B = np.zeros( (6*d, 3, T))
-	for j in np.arange(1, d+1):
-		B[0 + 6*k] = np.array([np.sqrt(2) * np.cos(2 * np.pi * j * x), np.zeros(T), np.zeros(T)])
-		B[1 + 6*k] = np.array([np.zeros(T), np.sqrt(2) * np.cos(2 * np.pi * j * x), np.zeros(T)])
-		B[2 + 6*k] = np.array([np.zeros(T), np.zeros(T), np.sqrt(2) * np.cos(2 * np.pi * j * x)])
-		B[3 + 6*k] = np.array([np.sqrt(2) * np.sin(2 * np.pi * j * x), np.zeros(T), np.zeros(T)])
-		B[4 + 6*k] = np.array([np.zeros(T), np.sqrt(2) * np.sin(2 * np.pi * j * x), np.zeros(T)])
-		B[5 + 6*k] = np.array([np.zeros(T), np.zeros(T), np.sqrt(2) * np.sin(2 * np.pi * j * x)])
-		k = k + 1
+  B = np.zeros((6*d, 3, T))
+  k = 0
+  for j in np.arange(1, d+1):
+    B[0 + 6*k] = np.array([np.sqrt(2) * np.cos(2 * np.pi * j * x), np.zeros(T), np.zeros(T)])
+    B[1 + 6*k] = np.array([np.zeros(T), np.sqrt(2) * np.cos(2 * np.pi * j * x), np.zeros(T)])
+    B[2 + 6*k] = np.array([np.zeros(T), np.zeros(T), np.sqrt(2) * np.cos(2 * np.pi * j * x)])
+    B[3 + 6*k] = np.array([np.sqrt(2) * np.sin(2 * np.pi * j * x), np.zeros(T), np.zeros(T)])
+    B[4 + 6*k] = np.array([np.zeros(T), np.sqrt(2) * np.sin(2 * np.pi * j * x), np.zeros(T)])
+    B[5 + 6*k] = np.array([np.zeros(T), np.zeros(T), np.sqrt(2) * np.sin(2 * np.pi * j * x)])
+    k = k + 1
 
-	B = np.concatenate((constB, B))
+  #B[0] = B[0] * constB[0]
+  #B_tile = np.tile(constB,(1,4))
+  #print(B_tile.shape)
+  #print(B_tile)
 
-	return B
+  #B = np.concatenate((constB, B))
+  #B = np.append((constB, B), axis = 1)
+  #Return to this, the shape is correct, but the values look off
+
+  return B
+
 
 def form_basis_of_tangent_space_of_S_at_q(Bnew, G_O_q):
 
 	# T_q(S) = T_q(C) + T_q(O_q)^{\perp}
+  # S in this case references closed orbits of C^o
+  # S = {[q] | q in C^o}
 	# Subtract the projection of basis of T_q(C) onto T_q(O_q) from itself
 	# i.e. basis(T_q(C)) - <basis(T_q(C)), basis(T_q(O_q))> * basis(T_q(O_q))
 
@@ -184,7 +201,7 @@ def project_to_basis(alpha_t_array, Y):
 
 	return A, V
 
-
+# Needs editing
 def form_basis_O_q(B,q):
     d = len(B)
     n,T = q.shape

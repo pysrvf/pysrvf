@@ -51,7 +51,7 @@ def get_mean(qarr, is_closed, num_itr):
 
     for i in trange(N, desc = 'Shapes', leave = False):#range(N):
       qshapes[1] = qarr[i]
-      _, alpha_t_arr_i, _, _, _, geo_dist_arr_i = geodesic_distance_all(qshapes, 'all', is_closed)
+      _, alpha_t_arr_i, _, _, _, geo_dist_arr_i = geodesic_distance_all(qshapes, 'pairwise', is_closed)
       alpha_t_mean += alpha_t_arr_i[0][1]
       sum_sq_dist += np.square(geo_dist_arr_i)
 

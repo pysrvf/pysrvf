@@ -12,7 +12,7 @@ import time
 ### ----- 2d examples ----- ###
 # Dog curves
 # Shape is (N x n x T)
-Xdata = np.load('../data/2d/dog_curves.npy')
+Xdata = np.load('../data/3d/sine_curves.npy')
 qmean, pmean, pmean_scaled, reformatted_Xdata, qarr, alpha_t_arr = get_data_mean(Xdata)
 
 # 2d parametric curves
@@ -38,7 +38,6 @@ if n == 1:
 elif n == 2:
 	for c in reformatted_Xdata:
 		plt.plot(c[0,:], c[1,:], alpha = 0.4)
-	plt.plot(pmean_scaled[0,:], pmean_scaled[1,:], 'k--')
 elif n == 3:
 	from mpl_toolkits.mplot3d import Axes3D
 	fig = plt.figure()

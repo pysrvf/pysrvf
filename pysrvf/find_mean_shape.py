@@ -43,7 +43,6 @@ def get_mean(qarr, is_closed, num_itr):
   norm_alpha_t_mean = np.zeros(num_itr)
   sum_sq_dist_itr = np.zeros((num_itr, n, T))
 
-<<<<<<< HEAD
   for itr in trange(num_itr, desc = 'Iteration'):
     # print('\nIteration {}'.format(itr+1))
     alpha_t_mean = np.zeros((n, T))

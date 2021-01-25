@@ -69,8 +69,6 @@ def get_data_mean(Xdata, subject_first = True):
 		pmean_scaled = pmean
 
 	return qmean, pmean, pmean_scaled, Xdata, qarr, alpha_t_arr
-<<<<<<< HEAD
-=======
 
 
 def get_deformation_field_from_tangent_vectors(alpha_t_arr):
@@ -85,4 +83,3 @@ def get_deformation_field_from_tangent_vectors(alpha_t_arr):
 	alpha_t_mag = np.sum(alpha_t_mean**2,axis=0)**(1./2)
 	alpha_t_mag = savgol_filter(alpha_t_mag, 9, 2)
 	return alpha_t_mag
->>>>>>> 993b13b43ff1a4feaf60fa8dfbe8a469ab417c0a

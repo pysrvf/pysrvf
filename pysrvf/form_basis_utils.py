@@ -155,14 +155,7 @@ def form_basis_L2_R3(d, T):
     B[5 + 6*k] = np.array([np.zeros(T), np.zeros(T), np.sqrt(2) * np.sin(2 * np.pi * j * x)])
     k = k + 1
 
-  #B[0] = B[0] * constB[0]
-  #B_tile = np.tile(constB,(1,4))
-  #print(B_tile.shape)
-  #print(B_tile)
-
   B = np.concatenate((constB, B))
-  #B = np.append((constB, B), axis = 1)
-  #Return to this, the shape is correct, but the values look off
 
   return B
 

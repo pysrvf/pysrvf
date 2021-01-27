@@ -201,7 +201,6 @@ def project_to_basis(alpha_t_array, Y):
 
 	return A, V
 
-# Needs editing
 def form_basis_O_q(B,q):
     d = len(B)
     n,T = q.shape
@@ -213,10 +212,10 @@ def form_basis_O_q(B,q):
     R1 = np.array([[0,0,1], [0,0,0], [-1,0,0]])
     R2 = np.array([[0,0,0], [0,0,1], [0,-1,0]])
 
-    G = np.zeros((3,3,3))
-    G[0] = R0 * q
-    G[1] = R1 * q
-    G[2] = R2 * q
+    G = np.zeros((n,n,T))
+    G[0] = R0 @ q
+    G[1] = R1 @ q
+    G[2] = R2 @ q
 
     # Calculate derivatives of q
     qdiff = np.zeros(q.shape)
@@ -228,12 +227,12 @@ def form_basis_O_q(B,q):
     for i in range(0,d):
         Vdiff[i,:] = np.gradient(V[i,:], 2*np.pi / (T-1))
 
-    D_q = np.zeros((d,d,d))
+    D_q = np.zeros((d,n,T))
     for i in range(0,d):
         tmp1 = np.tile(V[i,:],(n,1))
         tmp2 = np.tile(Vdiff[i,:],(n,1))
-        D_q[i] = qdiff * tmp1 + (1/2) * q * tmp2
+        D_q[i] = np.multiply(qdiff,tmp1) + (1/2) * np.multiply(q,tmp2)
 
-    O_q = np.array([G,D_q])
+    O_q = np.concatenate((G,D_q))
 
     return O_q

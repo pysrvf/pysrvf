@@ -160,7 +160,7 @@ def form_basis_L2_R3(d, T):
   #print(B_tile.shape)
   #print(B_tile)
 
-  #B = np.concatenate((constB, B))
+  B = np.concatenate((constB, B))
   #B = np.append((constB, B), axis = 1)
   #Return to this, the shape is correct, but the values look off
 

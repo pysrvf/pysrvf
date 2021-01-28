@@ -13,10 +13,32 @@ def tpca_from_data(X):
     return
 
 
-def tpca_from_mean(qmean, tangent_vectors, odir):
+def tpca_from_mean(qmean, tangent_vectors):
 
     epsilon = 0.0001
-    Y = gram_schmidt(tangent_vectors)
+    d,_,n,T = tangent_vectors.shape
+
+    B = form_basis_L2_R3(d,T)
+    B = gram_schmidt(B)
+    Bnew = form_basis_of_tangent_space_of_S_at_q(B, qmean)
+
+    G_O_q = form_basis_O_q(B,qmean)
+    G_O_q = gram_schmidt(G_O_q)
+
+    # T_q(C) = T_q(S) + T_q(O_q)^{\perp}
+    # Subtract the projection of basis of T_q(C) onto T_q(O_q) from itself
+    # i.e. basis(T_q(C)) - <basis(T_q(C)), basis(T_q(O_q))> * basis(T_q(O_q))
+
+    Bnew = gram_schmidt(Bnew)
+    G = form_basis_of_tangent_space_of_S_at_q(Bnew, G_O_q)
+    G = gram_schmidt(G) # Orthogonalize the basis of T_mu(S)
+
+    # From this point onwards G is the Fourier basis for T_mu(S)
+    # Project the tangent vectors on this basis
+    # -----------
+
+
+    #Y = gram_schmidt(tangent_vectors)
 
     # project_to_tangent_C_q
     # Xproj = utils.Project_To_Basis(tangent_vectors,Y)

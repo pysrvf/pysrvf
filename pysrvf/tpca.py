@@ -4,7 +4,7 @@ from scipy import stats
 import pysrvf.geodesic_utils
 from pysrvf.geodesic_utils import project_tangent
 import pysrvf.generic_utils
-from pysrvf.form_basis_utils import gram_schmidt
+from pysrvf.form_basis_utils import *
 from pysrvf.main_mean import get_data_mean
 
 def tpca_from_data(X):
@@ -16,7 +16,7 @@ def tpca_from_data(X):
 def tpca_from_mean(qmean, tangent_vectors):
 
     epsilon = 0.0001
-    d,_,n,T = tangent_vectors.shape
+    d,n,T = tangent_vectors.shape
 
     B = form_basis_L2_R3(d,T)
     B = gram_schmidt(B)
@@ -38,12 +38,11 @@ def tpca_from_mean(qmean, tangent_vectors):
     # -----------
 
 
-    #Y = gram_schmidt(tangent_vectors)
+    Y = gram_schmidt(tangent_vectors)
 
     # project_to_tangent_C_q
-    # Xproj = utils.Project_To_Basis(tangent_vectors,Y)
-    Xproj = np.array(Xproj)
-    C = np.cov(Xproj.T)
+    Xproj = project_to_basis(tangent_vectors,G)
+    C = np.cov(Xproj[0].T)
     [U, S, V] = linalg.svd(C)
 
     sDiag = np.diag(S)
@@ -77,3 +76,9 @@ def tpca_from_mean(qmean, tangent_vectors):
 # covdata.V = V;
 # covdata.C = C;
 # covdata.Cn = Cn;
+
+X = np.load('../data/3d/bundle_3d_2_1.npy')
+qmean, pmean, pmean_scaled, Xdata, qarr, alpha_t_arr = get_data_mean(X)
+info = tpca_from_mean(qmean, alpha_t_arr[0])
+#print(info['U'])
+

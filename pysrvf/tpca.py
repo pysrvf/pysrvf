@@ -6,6 +6,24 @@ from pysrvf.geodesic_utils import project_tangent
 import pysrvf.generic_utils
 from pysrvf.form_basis_utils import *
 from pysrvf.main_mean import get_data_mean
+from scipy.io import loadmat
+
+# Directory to mat
+mat_dir = '../data/Xdouble_bump_qmean.mat'
+
+# Load .mat
+mat_cont = loadmat(mat_dir)
+
+# Get mat keys/variables names
+mat_keys = mat_cont.keys()
+# Contents are:
+# dict_keys(['__header__', '__version__', '__globals__', 'X1', 'i', 'R', 'k', 't1', 't2', 't3', 't4', 'xm', 'xp', 'x', 'xmm', 't', 'xsine', 'X2', 'Xdata', 's    tp', 'dt', 'd', 'Xtemp', 'qarray', 'n', 'T', 'qmean', 'alpha_array', 'alpha_t_array', 'norm_alpha_t_mean', 'gamma_array', 'sum_sq_dist', 'pmean'])
+
+# extract qmean as 
+qmean = mat_cont['qmean']
+
+# extract alpha_t_array as
+alpha_t_arr = mat_cont['alpha_t_array']
 
 def tpca_from_data(X):
     qmean, pmean, pmean_scaled, Xdata, qarr, alpha_t_arr = get_data_mean(X)
@@ -16,7 +34,9 @@ def tpca_from_data(X):
 def tpca_from_mean(qmean, tangent_vectors):
 
     epsilon = 0.0001
-    d,n,T = tangent_vectors.shape
+    n, T = qmean.shape
+    #d,n,T = tangent_vectors.shape
+    d = 20
 
     B = form_basis_L2_R3(d,T)
     B = gram_schmidt(B)
@@ -38,7 +58,7 @@ def tpca_from_mean(qmean, tangent_vectors):
     # -----------
 
 
-    Y = gram_schmidt(tangent_vectors)
+    #Y = gram_schmidt(tangent_vectors)
 
     # project_to_tangent_C_q
     Xproj = project_to_basis(tangent_vectors,G)
@@ -56,7 +76,7 @@ def tpca_from_mean(qmean, tangent_vectors):
     ret_dict['Cn'] = Cn
     ret_dict['qmean'] = qmean
     ret_dict['alpha_t_array'] = tangent_vectors
-    ret_dict['Y'] = Y
+    #ret_dict['Y'] = Y
     ret_dict['Xproj'] = Xproj
     ret_dict['U'] = U
     ret_dict['S'] = S
@@ -77,8 +97,11 @@ def tpca_from_mean(qmean, tangent_vectors):
 # covdata.C = C;
 # covdata.Cn = Cn;
 
-X = np.load('../data/3d/bundle_3d_2_1.npy')
-qmean, pmean, pmean_scaled, Xdata, qarr, alpha_t_arr = get_data_mean(X)
-info = tpca_from_mean(qmean, alpha_t_arr[0])
+#X = np.load('../data/Xdouble_bump_qmean.npy',allow_pickle=True)
+#qmean, pmean, pmean_scaled, Xdata, qarr, alpha_t_arr = get_data_mean(X)
+#info = tpca_from_mean(qmean, alpha_t_arr[0])
 #print(info['U'])
+
+#Using the load mat
+info = tpca_from_mean(qmean, alpha_t_arr)
 

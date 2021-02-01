@@ -13,6 +13,15 @@ def tpca_from_data(X):
 
     return
 
+def pcacov(C):
+    '''
+    returns eigenvals, eigenvects, explained variance
+    '''
+    variance_explained = []
+    eigen_values, eigen_vectors = np.linalg.eigh(C)
+    for i in eigen_values:
+        variance_explained.append((i/sum(eigen_values))*100)
+    return eigen_vectors, eigen_values, np.array(variance_explained)
 
 def tpca_from_mean(qmean, tangent_vectors):
 
@@ -44,10 +53,12 @@ def tpca_from_mean(qmean, tangent_vectors):
     # project_to_tangent_C_q
     Xproj = project_to_basis(tangent_vectors,G)
     C = np.cov(Xproj[0].T)
-    [U, S, V] = linalg.svd(C)
+    # This changed: removed []
+    U, S, V = linalg.svd(C)
+    PC, Latent, Explained = pcacov(C)
+
 
     sDiag = np.diag(S)
-
     tmp = np.identity(len(S))
     tmp = epsilon*tmp
 
@@ -63,6 +74,9 @@ def tpca_from_mean(qmean, tangent_vectors):
     ret_dict['S'] = S
     ret_dict['V'] = V
     ret_dict['C'] = C
+    ret_dict['PC'] = PC
+    ret_dict['Latent'] = Latent
+    ret_dict['Explained'] = Explained
 
     return ret_dict
 

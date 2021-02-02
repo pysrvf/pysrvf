@@ -51,8 +51,10 @@ def tpca_from_mean(qmean, tangent_vectors):
     Y = gram_schmidt(tangent_vectors)
 
     # project_to_tangent_C_q
+    # Xproj shoud be something like 200 x 123
+    # I'll need to fix project_to_basis
     Xproj, X = project_to_basis(tangent_vectors,G)
-    C = np.cov(Xproj)
+    C = np.cov(Xproj.T)
     U, S, V = linalg.svd(C)
     PC, Latent, Explained = pcacov(C)
 

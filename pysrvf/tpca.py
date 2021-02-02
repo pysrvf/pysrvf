@@ -26,7 +26,8 @@ def pcacov(C):
 def tpca_from_mean(qmean, tangent_vectors):
 
     epsilon = 0.0001
-    d,n,T = tangent_vectors.shape
+    _,n,T = tangent_vectors.shape
+    d = 20
 
     B = form_basis_L2_R3(d,T)
     B = gram_schmidt(B)
@@ -47,13 +48,11 @@ def tpca_from_mean(qmean, tangent_vectors):
     # Project the tangent vectors on this basis
     # -----------
 
-
     Y = gram_schmidt(tangent_vectors)
 
     # project_to_tangent_C_q
-    Xproj = project_to_basis(tangent_vectors,G)
-    C = np.cov(Xproj[0].T)
-    # This changed: removed []
+    Xproj, X = project_to_basis(tangent_vectors,G)
+    C = np.cov(Xproj)
     U, S, V = linalg.svd(C)
     PC, Latent, Explained = pcacov(C)
 

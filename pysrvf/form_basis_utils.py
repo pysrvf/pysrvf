@@ -183,15 +183,14 @@ def form_basis_of_tangent_space_of_S_at_q(Bnew, G_O_q):
 
 
 def project_to_basis(alpha_t_array, Y):
-    #Y = np.array(Y)
 
-    V = np.zeros(Y.shape)
-    A = np.zeros((Y.shape[0], Y.shape[0]))
-    #A = np.zeros((alpha_t_array.shape[0], Y.shape[0]))
+    V = np.zeros(alpha_t_array.shape) # orginally Y.shape
+    #A = np.zeros((Y.shape[0], Y.shape[0]))
+    A = np.zeros((alpha_t_array.shape[0], Y.shape[0]))
     d,n,T = Y.shape
     #n, T = np.shape(Y[0])
-    #for ii in np.arange(0, alpha_t_array.shape[0]):
-    for ii in np.arange(0, Y.shape[0]):
+    for ii in np.arange(0, alpha_t_array.shape[0]):
+    #for ii in np.arange(0, Y.shape[0]):
         V[ii] = np.zeros((n,T))
         for jj in np.arange(0, Y.shape[0]):
             A[ii, jj] = inner_product_L2(alpha_t_array[ii], Y[jj])

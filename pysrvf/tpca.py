@@ -51,18 +51,13 @@ def tpca_from_mean(qmean, tangent_vectors):
     Y = gram_schmidt(tangent_vectors)
 
     # project_to_tangent_C_q
-    # Xproj shoud be something like 200 x 123
-    # I'll need to fix project_to_basis
     Xproj, X = project_to_basis(tangent_vectors,G)
-    C = np.cov(Xproj.T)
+    C = np.cov(Xproj)
     U, S, V = linalg.svd(C)
-    PC, Latent, Explained = pcacov(C)
-
 
     sDiag = np.diag(S)
     tmp = np.identity(len(S))
     tmp = epsilon*tmp
-
     Cn = U*(tmp+sDiag)*U.T
 
     ret_dict = {}
@@ -75,9 +70,10 @@ def tpca_from_mean(qmean, tangent_vectors):
     ret_dict['S'] = S
     ret_dict['V'] = V
     ret_dict['C'] = C
-    ret_dict['PC'] = PC
-    ret_dict['Latent'] = Latent
-    ret_dict['Explained'] = Explained
+    ret_dict['X'] = X
+    #ret_dict['PC'] = PC
+    #ret_dict['Latent'] = Latent
+    #ret_dict['Explained'] = Explained
 
     return ret_dict
 
@@ -92,5 +88,7 @@ def tpca_from_mean(qmean, tangent_vectors):
 # covdata.V = V;
 # covdata.C = C;
 # covdata.Cn = Cn;
+
+
 
 

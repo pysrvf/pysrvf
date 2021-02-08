@@ -62,7 +62,8 @@ def get_data_mean(Xdata, subject_first = True):
     # Scale mean to match the scale of original data
     if n >= 2:
         scaling_factor = np.mean([induced_norm_L2(c) for c in Xdata])
-        pmean_scaled = scaling_factor*pmean*induced_norm_L2(pmean)
+        # Changed * to /
+        pmean_scaled = scaling_factor*pmean/induced_norm_L2(pmean)
         for i in range(n):
             pmean_scaled[i,:] -= np.mean(pmean_scaled[i,:])
     else:

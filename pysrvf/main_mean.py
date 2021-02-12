@@ -75,7 +75,7 @@ def get_data_mean(Xdata, subject_first = True):
 def get_deformation_field_from_tangent_vectors(alpha_t_arr):
 
     K = len(alpha_t_arr)
-    _, n, T = np.shape(alpha_t_arr[0])
+    n, T = np.shape(alpha_t_arr[0])
     alpha_t_mean = np.zeros((n,T))
     for ii in range(K):
         temp = alpha_t_arr[ii]

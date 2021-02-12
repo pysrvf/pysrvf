@@ -75,7 +75,7 @@ def get_mean(qarr, is_closed, num_itr):
         qshapes[1] = qarr[i]
         alpha_arr_i, alpha_t_arr_i, A_norm_iter_arr_i, E_geo_C_arr_i, gamma_arr_i, geo_dist_arr_i = \
           geodesic_distance_all(qshapes, 'pairwise', is_closed)
-        alpha_t_arr.append(alpha_t_arr_i[0])
+        alpha_t_arr.append(alpha_t_arr_i[0][1])
         alpha_arr.append(alpha_arr_i[0])
         gamma_arr.append(np.array(gamma_arr_i))
         A_norm_arr.append(A_norm_iter_arr_i)

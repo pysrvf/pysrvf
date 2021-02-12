@@ -170,7 +170,8 @@ def is_curve_closed(curve):
     if n == 1:
         return False
 
-    return np.sum(np.abs(curve[:,0] - curve[:,-1])) <= 1e-15
+    # return np.sum(np.abs(curve[:,0] - curve[:,-1])) <= 1e-15
+    return np.sum(np.abs(curve[:,0] - curve[:,-1])) <= np.min(np.sum(np.diff(curve, axis=1)**2, axis=0)/T)*1/T
 
 def batch_curve_to_q(curves):
     '''
@@ -225,14 +226,14 @@ def batch_q_to_curve(srvfs):
     N, n, T = np.shape(srvfs)
 
     # Determine if first curve is closed. All other curves will be labeled accordingly
-    is_closed = is_curve_closed(srvfs[0])
-    if is_closed:
-        print('Closed srvfs detected. {} total curves.'.format(N))
-    else:
-        print('Open srvfs detected. {} total curves.'.format(N))
+    # is_closed = is_curve_closed(srvfs[0])
+    # if is_closed:
+    #     print('Closed srvfs detected. {} total curves.'.format(N))
+    # else:
+    #     print('Open srvfs detected. {} total curves.'.format(N))
 
     #Make sure to add additional parameters to match curve_to_q ???
-    return [q_to_curve(q_i) for q_i in srvfs], is_closed
+    return [q_to_curve(q_i) for q_i in srvfs]
 
 def reparameterize_curve_gamma(curve, gamma):
     '''

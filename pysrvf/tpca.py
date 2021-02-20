@@ -10,8 +10,8 @@ from scipy.io import loadmat
 
 def tpca_from_data(X):
     qmean, pmean, pmean_scaled, Xdata, qarr, alpha_t_arr = get_data_mean(X)
-
-    return
+    covdata = tpca_from_mean(qmean, alpha_t_arr)
+    return covdata
 
 def pcacov(C):
     '''

@@ -233,3 +233,14 @@ def form_basis_O_q(B,q):
     O_q = np.concatenate((G,D_q))
 
     return O_q
+
+
+def recon_from_basis(Aproj, Y):
+    d,n,T = Y.shape
+    N, _ = Aproj.shape
+    V = np.zeros((N, n, T))
+    for ii in np.arange(0, Aproj.shape[0]):
+        V[ii] = np.zeros((n,T))
+        for jj in np.arange(0, Y.shape[0]):
+            V[ii] = V[ii] + Aproj[ii, jj] * Y[jj]
+    return V

@@ -23,13 +23,18 @@ def pcacov(C):
         variance_explained.append((i/sum(eigen_values))*100)
     return eigen_vectors, eigen_values, np.array(variance_explained)
 
+
 def tpca_from_mean(qmean, tangent_vectors):
 
     epsilon = 0.0001
     _,n,T = tangent_vectors.shape
     d = 20
 
-    B = form_basis_L2_R3(d,T)
+    if (n == 2):
+        B = form_basis_L2_R2(d,T)
+    if (n == 3):
+        B = form_basis_L2_R3(d, T)
+
     B = gram_schmidt(B)
     Bnew = form_basis_of_tangent_space_of_S_at_q(B, qmean)
 
@@ -52,7 +57,7 @@ def tpca_from_mean(qmean, tangent_vectors):
 
     # project_to_tangent_C_q
     Xproj, X = project_to_basis(tangent_vectors,G)
-    C = np.cov(Xproj)
+    C = np.cov(Xproj.T)
     U, S, V = linalg.svd(C)
 
     sDiag = np.diag(S)
@@ -71,24 +76,9 @@ def tpca_from_mean(qmean, tangent_vectors):
     ret_dict['V'] = V
     ret_dict['C'] = C
     ret_dict['X'] = X
+    ret_dict['Eigproj'] = np.dot(Xproj, U)
     #ret_dict['PC'] = PC
     #ret_dict['Latent'] = Latent
     #ret_dict['Explained'] = Explained
 
     return ret_dict
-
-
-
-# covdata.qmean = qmean;
-# covdata.alpha_t_array = alpha_t_array;
-# covdata.Y = Y;
-# covdata.Xproj = Xproj;
-# covdata.U = U;
-# covdata.S = S;
-# covdata.V = V;
-# covdata.C = C;
-# covdata.Cn = Cn;
-
-
-
-

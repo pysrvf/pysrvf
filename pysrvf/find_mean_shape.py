@@ -3,7 +3,7 @@ from pysrvf.generic_utils import *
 from pysrvf.geodesic_utils import *
 from pysrvf.form_basis_utils import *
 from pysrvf.compute_geodesic import *
-from tqdm import trange
+from tqdm.auto import tqdm, trange
 
 def get_mean(qarr, is_closed, num_itr):
     '''
@@ -49,7 +49,7 @@ def get_mean(qarr, is_closed, num_itr):
         sum_sq_dist = 0
         qshapes[0] = qmean
 
-        for i in trange(N, desc = 'Shapes', leave = False):#range(N):
+        for i in trange(N, desc = 'Shapes', leave=False):#range(N):
             qshapes[1] = qarr[i]
             _, alpha_t_arr_i, _, _, _, geo_dist_arr_i = geodesic_distance_all(qshapes, 'pairwise', is_closed)
             alpha_t_mean += alpha_t_arr_i[0][1]

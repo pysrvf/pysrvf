@@ -4,7 +4,8 @@ from pysrvf.generic_utils import *
 from pysrvf.geodesic_utils import *
 from pysrvf.form_basis_utils import *
 from scipy.integrate import trapz
-from tqdm import trange
+from tqdm.auto import tqdm, trange
+
 
 
 def compute_geodesic_C(q0, q1, stp, dt):

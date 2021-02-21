@@ -137,7 +137,7 @@ def form_basis_L2_R3(d, T):
     Note basis elements will be 6 x d
     '''
 
-    x = np.linspace(0, 2 * np.pi, T, True)
+    x = np.linspace(0, 1, T, True)
     sqrt_2 = np.sqrt(2)
     constB = np.zeros((3, 3, T))
 
@@ -154,6 +154,33 @@ def form_basis_L2_R3(d, T):
         B[3 + 6*k] = np.array([np.sqrt(2) * np.sin(2 * np.pi * j * x), np.zeros(T), np.zeros(T)])
         B[4 + 6*k] = np.array([np.zeros(T), np.sqrt(2) * np.sin(2 * np.pi * j * x), np.zeros(T)])
         B[5 + 6*k] = np.array([np.zeros(T), np.zeros(T), np.sqrt(2) * np.sin(2 * np.pi * j * x)])
+        k = k + 1
+
+    B = np.concatenate((constB, B))
+
+    return B
+
+
+def form_basis_L2_R2(d, T):
+    '''
+    Returns Schauder basis for L_2(R^2)
+    Note basis elements will be 4 x d + 2
+    '''
+
+    x = np.linspace(0, 1, T, True)
+    sqrt_2 = np.sqrt(2)
+    constB = np.zeros((2, 2, T))
+
+    constB[0] = np.array([np.sqrt(2) * np.ones(T), np.zeros(T)])
+    constB[1] = np.array([np.zeros(T), np.sqrt(2) * np.ones(T)])
+
+    B = np.zeros((4*d, 2, T))
+    k = 0
+    for j in np.arange(1, d+1):
+        B[0 + 4*k] = np.array([np.sqrt(2) * np.cos(2 * np.pi * j * x), np.zeros(T)])
+        B[1 + 4*k] = np.array([np.zeros(T), np.sqrt(2) * np.cos(2 * np.pi * j * x)])
+        B[2 + 4*k] = np.array([np.sqrt(2) * np.sin(2 * np.pi * j * x), np.zeros(T)])
+        B[3 + 4*k] = np.array([np.zeros(T), np.sqrt(2) * np.sin(2 * np.pi * j * x)])
         k = k + 1
 
     B = np.concatenate((constB, B))
@@ -204,15 +231,22 @@ def form_basis_O_q(B,q):
 
     # Form basis for L2(I, R)
     V = form_basis_D(d,T)
+    if n == 2:
+        R0 = np.array([[1, 0], [0, 1]])
+        R1 = np.array([[0, 1], [-1, 0]])
+        G = np.zeros((n,n,T))
+        G[0] = R0 @ q
+        G[1] = R1 @ q
 
-    R0 = np.array([[0,1,0], [-1,0,0], [0,0,0]])
-    R1 = np.array([[0,0,1], [0,0,0], [-1,0,0]])
-    R2 = np.array([[0,0,0], [0,0,1], [0,-1,0]])
+    if n == 3:
+        R0 = np.array([[0,1,0], [-1,0,0], [0,0,0]])
+        R1 = np.array([[0,0,1], [0,0,0], [-1,0,0]])
+        R2 = np.array([[0,0,0], [0,0,1], [0,-1,0]])
 
-    G = np.zeros((n,n,T))
-    G[0] = R0 @ q
-    G[1] = R1 @ q
-    G[2] = R2 @ q
+        G = np.zeros((n,n,T))
+        G[0] = R0 @ q
+        G[1] = R1 @ q
+        G[2] = R2 @ q
 
     # Calculate derivatives of q
     qdiff = np.zeros(q.shape)

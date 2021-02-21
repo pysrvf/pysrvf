@@ -38,3 +38,4 @@ def set_generic_fig_properties(fig, height=600, width=600, title_text="", showti
 
 
     return fig
+

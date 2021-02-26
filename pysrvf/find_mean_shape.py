@@ -43,13 +43,13 @@ def get_mean(qarr, is_closed, num_itr):
     norm_alpha_t_mean = np.zeros(num_itr)
     sum_sq_dist_itr = np.zeros((num_itr, n, T))
 
-    for itr in trange(num_itr, desc = 'Iteration'):
+    for itr in trange(num_itr, desc = 'Iteration', disable=os.environ.get("DISABLE_TQDM")):
         # print('\nIteration {}'.format(itr+1))
         alpha_t_mean = np.zeros((n, T))
         sum_sq_dist = 0
         qshapes[0] = qmean
 
-        for i in trange(N, desc = 'Shapes', leave=False):#range(N):
+        for i in trange(N, desc = 'Shapes', leave=False, disable=os.environ.get("DISABLE_TQDM")):#range(N):
             qshapes[1] = qarr[i]
             _, alpha_t_arr_i, _, _, _, geo_dist_arr_i = geodesic_distance_all(qshapes, 'pairwise', is_closed)
             alpha_t_mean += alpha_t_arr_i[0][1]
@@ -72,7 +72,7 @@ def get_mean(qarr, is_closed, num_itr):
     geo_dist_arr = []
 
 
-    for i in trange(N):
+    for i in trange(N, disable=os.environ.get("DISABLE_TQDM")):
         qshapes[1] = qarr[i]
         alpha_arr_i, alpha_t_arr_i, A_norm_iter_arr_i, E_geo_C_arr_i, gamma_arr_i, geo_dist_arr_i = \
           geodesic_distance_all(qshapes, 'pairwise', is_closed)

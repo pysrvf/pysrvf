@@ -363,7 +363,7 @@ def geodesic_distance_all(qarr, computation_type, is_closed):
     geo_dist_arr = []
 
     if computation_type == 'all':
-        for i in trange(num_shapes, desc='Compute Geodesics ', leave=False):  # range(N):
+        for i in trange(num_shapes, desc='Compute Geodesics ', leave=False, disable=os.environ.get("DISABLE_TQDM")):  # range(N):
         # for i in range(num_shapes):
             q1 = qarr[i]
             for j in np.arange(i+1, num_shapes):

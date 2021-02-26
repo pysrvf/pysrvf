@@ -78,6 +78,7 @@ def tpca_from_mean(qmean, tangent_vectors):
     ret_dict['V'] = V
     ret_dict['C'] = C
     ret_dict['X'] = X
+    ret_dict['G'] = G
     ret_dict['Eigproj'] = np.dot(Xproj, U)
     #ret_dict['PC'] = PC
     #ret_dict['Latent'] = Latent

@@ -9,7 +9,7 @@ from pysrvf.find_mean_shape import get_mean
 # from find_mean_shape import get_mean
 from scipy.signal import savgol_filter
 
-def get_data_mean(Xdata, subject_first = True):
+def get_data_mean(Xdata, subject_first = True, num_iter=15):
     '''
     Given a collection of shapes, will return their Karcher mean
     Inputs:
@@ -50,7 +50,7 @@ def get_data_mean(Xdata, subject_first = True):
     qarr, is_closed = batch_curve_to_q(Xdata)
 
     # Number of iterations to run algorithm for
-    num_iter = 15
+    # num_iter = 15
 
     # Get qmean
     [qmean, alpha_arr, alpha_t_arr, norm_alpha_t_mean, gamma_arr, \
@@ -69,7 +69,7 @@ def get_data_mean(Xdata, subject_first = True):
     else:
         pmean_scaled = pmean
 
-    return qmean, pmean, pmean_scaled, Xdata, qarr, alpha_t_arr
+    return qmean, pmean, pmean_scaled, Xdata, qarr, alpha_t_arr, gamma_arr
 
 
 def get_deformation_field_from_tangent_vectors(alpha_t_arr):

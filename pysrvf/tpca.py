@@ -8,9 +8,11 @@ from pysrvf.form_basis_utils import *
 from pysrvf.main_mean import get_data_mean
 from scipy.io import loadmat
 
-def tpca_from_data(X):
-    qmean, pmean, pmean_scaled, Xdata, qarr, alpha_t_arr = get_data_mean(X)
+
+def tpca_from_data(X, num_iter=15):
+    qmean, pmean, pmean_scaled, Xdata, qarr, alpha_t_arr, gamma_arr = get_data_mean(X, num_iter=num_iter)
     covdata = tpca_from_mean(qmean, alpha_t_arr)
+    covdata['gamma_array'] = gamma_arr
     return covdata
 
 def pcacov(C):

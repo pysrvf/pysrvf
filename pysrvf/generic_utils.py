@@ -496,7 +496,7 @@ def estimate_gamma(q, is_closed):
             pgrad = np.gradient(p[0,:], 2*np.pi/T)
             ds = T*np.abs(pgrad)
         else:
-            pgrad = np.gradient(p, 2*np.pi/T)
+            pgrad = np.gradient(p, 2*np.pi/T, axis=1)
             ds = T*np.sqrt(np.sum(np.square(pgrad), axis = 0))
         cum_sum = cumtrapz(ds, dx = 2*np.pi/T, initial = 0)
         gamma = 2*np.pi*cum_sum/np.max(cum_sum)

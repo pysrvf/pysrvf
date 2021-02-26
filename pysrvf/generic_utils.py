@@ -516,3 +516,45 @@ def get_deformation_field_from_mean(qmean, alpha_t_array):
 
     k, n, T = np.shape(alpha_t_array)
     K = len(alpha_t_array)
+
+
+def curve_length(X):
+
+    pgrad = np.gradient(X, axis=1)
+    arc_length = np.linalg.norm(pgrad, axis=0)
+    return sum(arc_length)
+
+
+def estimate_curve_pose(X):
+
+    n, T = X.shape
+    L = curve_length(X)
+    POS = np.mean(X, axis=1)
+    X = X - POS[:, np.newaxis]
+    X /= L
+
+    XYZaxis = np.tile(np.linspace(0, 2 * np.pi, T, True), (n, 1))
+    POSaxis = np.mean(XYZaxis, axis=1)
+    XYZaxis = XYZaxis - POSaxis[:, np.newaxis]
+    L1 = curve_length(XYZaxis)
+    XYZaxis = XYZaxis / L1
+
+    _, R = find_best_rotation(XYZaxis, X)
+
+    return L, R, POS
+
+
+def repose_curve(X, L, R, POS):
+
+    n, T = X.shape
+    curPOS = np.mean(X, axis=1)
+    L = curve_length(X)
+    X /= L
+    X = X - curPOS[:, np.newaxis]
+
+    # Rotation
+    Xnew = np.matmul(R, X)
+    Xnew = Xnew*L/curve_length(Xnew)
+    Xnew = Xnew - POS[:, np.newaxis]
+
+    return Xnew

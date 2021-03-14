@@ -17,6 +17,7 @@ def plot_3d_curve(X, titlestr=""):
     fig = set_generic_fig_properties(fig, title_text=titlestr)
     fig.show()
 
+
 def plot_3d_curve_set(X, titlestr=""):
 
     # X is a N x n x T numpyarray
@@ -39,3 +40,14 @@ def set_generic_fig_properties(fig, height=600, width=600, title_text="", showti
 
     return fig
 
+
+def plot_1d_function_vec(X, titlestr=""):
+    # X is a 2D array of row-wise functions
+    fig = go.Figure()
+    for ii in range(X.shape[0]):
+        pass
+
+        # fig.add_trace(go.Scatter3d(x=X[ii, :], y=X[ii, :], mode='lines'))
+
+
+    return

@@ -558,3 +558,30 @@ def repose_curve(X, L, R, POS):
     Xnew = Xnew - POS[:, np.newaxis]
 
     return Xnew
+
+
+def resample_curve_uniform(X, T=100):
+
+    n, _ = X.shape
+    X = remove_duplicate_vertices(X)
+    Xgrad = np.gradient(X, axis=1)
+    arc_length = np.linalg.norm(Xgrad, axis=0)
+    cumulative_arc_length = np.cumsum(arc_length)
+
+    Xnew = np.zeros((n, T))
+    for i in range(0, n):
+        Xnew[i, :] = np.interp(np.transpose(np.linspace(cumulative_arc_length[0],
+                               cumulative_arc_length[-1], T)), cumulative_arc_length, X[i, :])
+    return Xnew
+
+
+def remove_duplicate_vertices(X):
+
+    n, T = X.shape
+    epsilon = 1/20.0*1.0/T
+    Xgrad = np.gradient(X, axis=1)
+    arc_length = np.linalg.norm(Xgrad, axis=0)
+
+    duplicate_status = arc_length > epsilon  # Where False, the index is duplicate
+    X = X[:, duplicate_status]
+    return X

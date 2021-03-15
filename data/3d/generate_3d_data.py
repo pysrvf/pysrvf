@@ -12,7 +12,7 @@ def get_3d_bundle(curves_in_bundle = 2, random_state = 1):
   Xdata = Xdata[:,:,perm]
 
   # Reformat Xdata
-  _,_,_, reformatted_Xdata,_,_ = get_data_mean(Xdata, subject_first = False)
+  qmean, pmean, pmean_scaled, reformatted_Xdata, qarr, alpha_t_arr, gamma_arr = get_data_mean(Xdata, subject_first = False)
   reformatted_Xdata = np.array(reformatted_Xdata)
   N, n, T = np.shape(reformatted_Xdata)
 
@@ -23,13 +23,13 @@ def get_3d_bundle(curves_in_bundle = 2, random_state = 1):
 
   return new_bundle
 
-# new_bundle is a 3d bundle, has 2 curves, and random state is 1
+# new_bundle is a 3d bundle, has n curves, and random state is 1
 # new_bundle has shape (N,n,T)
 
 
 #Saving New Bundle
-bundle_3d_2_1 = get_3d_bundle(2,1)
-np.save('bundle_3d_2_1.npy',bundle_3d_2_1)
+bundle_3d_10_curves = get_3d_bundle(10,1)
+np.save('bundle_3d_10_curves.npy',bundle_3d_10_curves)
 
 #Plotting new_bundle
 '''

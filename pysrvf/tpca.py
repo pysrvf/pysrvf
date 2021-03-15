@@ -29,7 +29,7 @@ def pcacov(C):
 def tpca_from_mean(qmean, tangent_vectors):
 
     epsilon = 0.0001
-    _,n,T = tangent_vectors.shape
+    n,N,T = tangent_vectors.shape
     d = 20
 
     if (n == 2):

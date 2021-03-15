@@ -570,8 +570,8 @@ def resample_curve_uniform(X, T=100):
 
     Xnew = np.zeros((n, T))
     for i in range(0, n):
-        Xnew[i, :] = np.interp(np.transpose(np.linspace(cumulative_arc_length[0],
-                               cumulative_arc_length[-1], T)), cumulative_arc_length, X[i, :])
+        Xnew[i, :] = np.interp(np.linspace(cumulative_arc_length[0],
+                               cumulative_arc_length[-1], T), cumulative_arc_length, X[i, :])
     return Xnew
 
 

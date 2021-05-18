@@ -7,7 +7,7 @@ new_curves = np.zeros((n, T, N))
 for i in range(N):
 	new_curves[:, :, i] = curves[i]
 
-np.save('../data/2d/misc.npy', new_curves)
+#np.save('../data/2d/misc.npy', new_curves)
 
 
 
@@ -18,7 +18,7 @@ from scipy import io
 import time
 import generic_utils
 import numpy as np
-from .srvf_utils import match
+from pysrvf.srvf_utils import match
 qarray = io.loadmat('../data/q.mat')
 qarr = np.array([qarray['q1'], qarray['q2']])
 

@@ -522,16 +522,17 @@ def curve_length(X):
 
     pgrad = np.gradient(X, axis=1)
     arc_length = np.linalg.norm(pgrad, axis=0)
-    return sum(arc_length)
+    return np.sum(arc_length)
 
 
 def estimate_curve_pose(X):
 
     n, T = X.shape
-    L = curve_length(X)
-    POS = np.mean(X, axis=1)
-    X = X - POS[:, np.newaxis]
-    X /= L
+    Y = X
+    L = curve_length(Y)
+    POS = np.mean(Y, axis=1)
+    Y = Y - POS[:, np.newaxis]
+    Y /= L
 
     XYZaxis = np.tile(np.linspace(0, 2 * np.pi, T, True), (n, 1))
     POSaxis = np.mean(XYZaxis, axis=1)
@@ -539,7 +540,7 @@ def estimate_curve_pose(X):
     L1 = curve_length(XYZaxis)
     XYZaxis = XYZaxis / L1
 
-    _, R = find_best_rotation(XYZaxis, X)
+    _, R = find_best_rotation(XYZaxis, Y)
 
     return L, R, POS
 
@@ -547,15 +548,21 @@ def estimate_curve_pose(X):
 def repose_curve(X, L, R, POS):
 
     n, T = X.shape
-    curPOS = np.mean(X, axis=1)
-    L = curve_length(X)
-    X /= L
-    X = X - curPOS[:, np.newaxis]
+    Y = X
+    curPOS = np.mean(Y, axis=1)
+    Y = Y / curve_length(Y)
+
+    # zero-out the current position
+    Y = Y - curPOS[:, np.newaxis]
 
     # Rotation
-    Xnew = np.matmul(R, X)
-    Xnew = Xnew*L/curve_length(Xnew)
-    Xnew = Xnew - POS[:, np.newaxis]
+    Xnew = np.matmul(R, Y)
+
+    # Scale
+    Xnew = (Xnew*L)/curve_length(Xnew)
+
+    # Translation
+    Xnew = Xnew + POS[:, np.newaxis]
 
     return Xnew
 

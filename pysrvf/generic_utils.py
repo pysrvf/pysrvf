@@ -4,7 +4,8 @@ import os
 import warnings
 from scipy.interpolate import interp1d
 from scipy.integrate import cumtrapz
-from dpmatchsrvf import dpmatch
+import dpmatchsrvf
+
 
 def inner_product_L2(u, v):
     '''
@@ -438,7 +439,7 @@ def initialize_gamma_using_DP(q1, q2, is_closed):
     # os.system('./DP_Shape_Match_SRVF_nDim DPshapedata.dat gamma.dat')
     # os.system('./DPShapeMatch DPshapedata.dat gamma.dat')
 
-    gamma = dpmatch().match(q1, q2)
+    gamma = dpmatchsrvf.match(q1, q2)
 
     # gamma = load_gamma('gamma.dat')
     gamma = 2*np.pi*gamma/np.max(gamma)

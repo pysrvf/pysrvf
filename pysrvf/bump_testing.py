@@ -4,7 +4,7 @@ from pysrvf.generic_utils import curve_to_q
 from pysrvf.generic_utils import q_to_curve
 from pysrvf.generic_utils import reparameterize_curve_gamma
 from pysrvf.generic_utils import group_action_by_gamma
-from dpmatchsrvf import dpmatch
+import dpmatchsrvf
 import matplotlib.pyplot as plt
 
 bumps = loadmat('synthesized_bumps.mat')['bumps']
@@ -14,7 +14,7 @@ p2 = np.expand_dims(bumps[4,:], axis = 0)
 q1 = curve_to_q(p1)
 q2 = curve_to_q(p2)
 
-gamma = dpmatch().match(q1, q2)
+gamma = dpmatchsrvf.match(q1, q2)
 gamma = 2*np.pi*gamma/np.max(gamma)
 
 # Load matlab gamma file

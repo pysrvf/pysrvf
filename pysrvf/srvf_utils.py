@@ -4,7 +4,7 @@ from pysrvf.generic_utils import inner_product_L2
 from pysrvf.generic_utils import induced_norm_L2
 from pysrvf.generic_utils import curve_to_q
 from pysrvf.generic_utils import group_action_by_gamma
-from dpmatchsrvf import dpmatch
+import dpmatchsrvf
 
 
 # def project_B(q, D = None):
@@ -176,7 +176,7 @@ def match(f1, f2, is_closed=False, qfunc=True):
 		q1 = curve_to_q(f1)
 		q2 = curve_to_q(f2)
 
-	gamma = dpmatch().match(q1, q2)
+	gamma = dpmatchsrvf.match(q1, q2)
 	gamma = 2*np.pi*gamma/np.max(gamma)
 	f2n = group_action_by_gamma(q2, gamma, is_closed)
 

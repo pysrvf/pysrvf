@@ -13,7 +13,7 @@ np.save('../data/2d/misc.npy', new_curves)
 
 import os
 import numpy as np
-from dpmatchsrvf import dpmatch
+import dpmatchsrvf
 from scipy import io
 import time
 import generic_utils
@@ -30,7 +30,7 @@ gamma = generic_utils.load_gamma('gamma.dat')
 print(time.time() - t)
 
 t = time.time()
-gamma = dpmatch().match(qarr[0], qarr[1])
+gamma = dpmatchsrvf.match(qarr[0], qarr[1])
 print(time.time() - t)
 
 
